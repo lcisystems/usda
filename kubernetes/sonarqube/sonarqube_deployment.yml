@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sonarqube-deployment
+  namespace: team-cicd-controlplane
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sonarqube
+  template:
+    metadata:
+      labels:
+        app: sonarqube
+    spec:
+      containers:
+        - name: sonarqube
+          image: sonarqube:lts-community
+          imagePullPolicy: IfNotPresent
+          env:
+          - name: "SONARQUBE_JDBC_USERNAME"
+            value: "sonarqube"
+          - name: "SONARQUBE_JDBC_URL"
+            value: "jdbc:postgresql://postgres:5432/sonarqube"
+          - name: "SONARQUBE_JDBC_PASSWORD"
+            valueFrom:
+              secretKeyRef:
+                name: postgres
+                key: password
+          ports:
+          - containerPort: 9000
+            protocol: TCP
+          resources:
+            # requests:
+            #   cpu: 200m
+            #   memory: 1024Mi
+            # limits:
+            #   cpu: 500m
+            #   memory: 2048Mi
+          volumeMounts:
+          - mountPath: "/opt/sonarqube/data/"
+            name: sonar-data
+          - mountPath: "/opt/sonarqube/extensions/"
+            name: sonar-data
+          
+      volumes:
+      - name: sonar-data
+        persistentVolumeClaim:
+          claimName: sonar-data-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sonarqube-service
+spec:
+  selector:
+    app: sonarqube
+  ports:
+    - protocol: TCP
+      port: 9000
+      targetPort: 9000
+  type: LoadBalancer

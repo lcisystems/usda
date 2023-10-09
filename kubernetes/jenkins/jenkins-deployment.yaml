@@ -1,0 +1,81 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jenkins
+  namespace: team-cicd-controlplane
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jenkins-server
+  template:
+    metadata:
+      labels:
+        app: jenkins-server
+    spec:
+      securityContext:
+            fsGroup: 1000
+            runAsUser: 1000
+      # serviceAccountName: cicd-controlplane-sa
+      containers:
+        - name: jenkins
+          image: jenkins/jenkins:lts
+          resources:
+            limits:
+              memory: "4Gi"
+              cpu: "2000m"
+            requests:
+              memory: "2Gi"
+              cpu: "1000m"
+          ports:
+            - name: httpport
+              containerPort: 8080
+            - name: jnlpport
+              containerPort: 50000
+          # livenessProbe:
+          #   httpGet:
+          #     path: "/login"
+          #     port: 8080
+          #   initialDelaySeconds: 90
+          #   periodSeconds: 10
+          #   timeoutSeconds: 5
+          #   failureThreshold: 5
+          # readinessProbe:
+          #   httpGet:
+          #     path: "/login"
+          #     port: 8080
+          #   initialDelaySeconds: 60
+          #   periodSeconds: 10
+          #   timeoutSeconds: 5
+          #   failureThreshold: 3
+          volumeMounts:
+            - name: efs-volume
+              mountPath: /var/jenkins_home
+      volumes:
+        - name: efs-volume
+          persistentVolumeClaim:
+              claimName: efs-pvc
+---
+# apiVersion: v1
+# kind: ServiceAccount
+# metadata:
+#   name: cicd-controlplane-sa
+#   annotations:
+#     eks.amazonaws.com/role-arn: arn:aws:iam::665693299603:role/cluster-stack-teamcicdcontrolplaneAccessRole046309-BIJZU0Z0696J
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: jenkins-service
+  namespace: team-cicd-controlplane
+spec:
+  type: LoadBalancer
+  selector:
+    app: jenkins-server
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8080
+    - name: jnlp
+      port: 50000
+      targetPort: 50000

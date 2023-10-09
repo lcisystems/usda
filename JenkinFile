@@ -1,0 +1,210 @@
+pipeline {
+  agent {
+    kubernetes {
+      yaml '''
+        apiVersion: v1
+        kind: Pod
+        metadata:
+          name: build-server
+        spec:
+          containers:
+            - name: maven
+              image: maven:3-openjdk-17
+              command: 
+               - cat
+              tty: true
+            - name: kubectl
+              image: alpine/k8s:1.25.14
+              command:
+                - cat
+              tty: true
+            - name: dind
+              image: docker:20-dind
+              securityContext:
+                privileged: true
+              volumeMounts:
+                - name: dind-storage
+                  mountPath: /var/lib/docker
+          volumes:
+            - name: efs-volume
+              persistentVolumeClaim:
+                claimName: efs-pvc 
+            - name: dind-storage
+              emptyDir: {}
+        '''    
+    }
+  }
+    environment {
+        //artifact deployment S3 bucket.    
+        bucket = "confluence-assessments-task-4-enquizit-2022" 
+        //artifact deployment bucket region          
+        region = "us-east-1"  
+        //artifact upload bucket region. (optional)                    
+        region1 = "us-east-2" 
+        //aws credentials                    
+        aws_credential = "s3-profile" //aws credentials 
+        // Dockerhub credentials to push and pull images. 
+        DOCKERHUB_CREDENTIALS = "dockerhub"
+        KUBERNETES_CREDENTIALS  = 'eks-secrets'
+        NEXUS_VERSION = "nexus3"
+        NEXUS_PROTOCOL = "http"
+        NEXUS_URL = "a674b70ccfafe4ef7a728a2685dd5fba-1506899315.us-east-1.elb.amazonaws.com:8081"
+        NEXUS_REPOSITORY = "nexus-rep0"
+        NEXUS_CREDENTIAL_ID = "nexus-secret"
+        AWS_ACCOUNT_ID="665693299603"
+        AWS_DEFAULT_REGION="us-east-1" 
+        IMAGE_REPO_NAME="usda_poc"
+        IMAGE_TAG="latest"
+        REPOSITORY_URI = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}"
+        v="${BUILD_NUMBER}"
+    }
+  stages {
+    stage('Code-Review') {
+      steps {
+        container('maven') {
+          withSonarQubeEnv(installationName: 'Sonar', credentialsId: 'sonarqube-secret') {
+                sh 'java -version'
+                sh 'mvn -B -DskipTests clean package -Dv=${BUILD_NUMBER} sonar:sonar'
+          }
+        }
+      }
+    }
+    
+  stage("Publish to Nexus Repository Manager") {
+            steps {
+            container('maven') {
+                    script {
+                    def pom = readMavenPom(file: 'pom.xml');
+                    filesByGlob = findFiles(glob: "target/*.${pom.packaging}");
+                    echo "${filesByGlob[0].name} ${filesByGlob[0].path} ${filesByGlob[0].directory} ${filesByGlob[0].length} ${filesByGlob[0].lastModified}"
+                    artifactPath = filesByGlob[0].path;
+                    artifactExists = fileExists artifactPath;
+                    if(artifactExists) {
+                        echo "*** File: ${artifactPath}, group: ${pom.groupId}, packaging: ${pom.packaging}, version ${pom.version}";
+                        nexusArtifactUploader(
+                            nexusVersion: NEXUS_VERSION,
+                            protocol: NEXUS_PROTOCOL,
+                            nexusUrl: NEXUS_URL,
+                            groupId: pom.groupId,
+                            version: "${BUILD_NUMBER}.0.0",
+                            repository: NEXUS_REPOSITORY,
+                            credentialsId: NEXUS_CREDENTIAL_ID,
+                            artifacts: [
+                                [artifactId: pom.artifactId,
+                                classifier: '',
+                                file: artifactPath,
+                                type: pom.packaging],
+                                [artifactId: pom.artifactId,
+                                classifier: '',
+                                file: "pom.xml",
+                                type: "pom"]
+                            ]
+                        );
+                    } else {
+                        error "*** File: ${artifactPath}, could not be found";
+                    }
+                }
+            }
+        }
+     }
+  stage('Retrive Artifact from Nexus') {
+          steps {
+          container('dind') {
+            withCredentials([usernameColonPassword(credentialsId: 'nexus-secret', variable: 'NEXUS_CREDENTIAL_ID')]) {
+              sh'''
+              apk add curl
+              curl -u ${NEXUS_CREDENTIAL_ID} -o your_file.png "http://${NEXUS_URL}/repository/nexus-rep0/freeallianceInnovationLab/LoginWebApp/${BUILD_NUMBER}.0.0/LoginWebApp-${BUILD_NUMBER}.0.0.war"
+              '''
+            }
+          }
+        }
+      }
+     
+  stage('Buid Docker Image') {
+          steps {
+          container('dind') {
+            script {
+              sh '''
+              ls -la
+             '''
+  
+              dockerImage = docker.build REPOSITORY_URI + ":latest"
+                  
+        }
+    }
+  }
+}  
+  stage('Publish To AWS ECR') {
+          steps {
+          container('dind') {
+             script{// This is the script that build and push the Docker image of the application.
+                 
+                docker.withRegistry( "https://${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}",  "ecr:${AWS_DEFAULT_REGION}:" + aws_credential ) {
+                  dockerImage.push()
+                        
+               }           
+           }
+                  
+        }
+    }
+  }
+
+    stage('Add AWS Credentials') {
+      steps {
+        container('kubectl') {
+          script {
+              withCredentials([[
+                        $class: 'AmazonWebServicesCredentialsBinding',
+                        credentialsId: 's3-profile',
+                        accessKeyVariable: 'AWS_ACCESS_KEY',
+                        secretKeyVariable: 'AWS_SECRET_KEY'
+                    ]]) {
+                        sh '''
+                            #!/bin/bash
+                            if ! command -v aws &> /dev/null; then
+                                echo "AWS CLI is not installed. Please install it first."
+                                exit 1
+                            fi
+
+                            # Set the AWS access key and secret access key
+                            aws configure set aws_access_key_id "${AWS_ACCESS_KEY}"
+                            aws configure set aws_secret_access_key "${AWS_SECRET_KEY}"
+
+                            echo "AWS credentials updated successfully."
+                        '''
+
+                      }
+                    }
+                  }
+                }
+              }
+              
+
+    stage('Deploy App') {
+      steps {
+        container('kubectl') {
+          withKubeConfig([credentialsId: "${KUBERNETES_CREDENTIALS}" ,
+                    serverUrl: 'https://BF940C2362D0B0FBF08656E462353508.gr7.us-east-1.eks.amazonaws.com',
+                    ]) {
+                 sh '''
+                 kubectl create secret docker-registry regcred || true \
+                  --docker-server=${AWS_ACCOUNT}.dkr.ecr.${AWS_REGION}.amazonaws.com \
+                  --docker-username=AWS \
+                  --docker-password=$(aws ecr get-login-password) \
+                  --namespace=team-dev
+                 kubectl get pods --namespace=team-cicd-controlplane
+                 kubectl apply -f mysql-pvc.yaml --namespace=team-dev
+                 kubectl apply -f mysql-deployment.yaml --namespace=team-dev
+                 kubectl apply -f phpmyadmin-deployment.yaml --namespace=team-dev
+                 kubectl apply -f tomcat-deployment.yaml --namespace=team-dev
+                 kubectl set image deployment.v1.apps/tomcat-deployment tomcat=665693299603.dkr.ecr.us-east-1.amazonaws.com/usda_poc --namespace=team-dev
+
+
+                 ''' 
+                 
+              }
+            }
+          }
+        }
+      }
+    }
