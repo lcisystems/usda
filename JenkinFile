@@ -165,6 +165,7 @@ stage('AWS Cli SetUp for image signing') {
                     ]]) {
                         sh '''
                             #!/bin/bash
+                            aws --version
                             if ! command -v aws &> /dev/null; then
                                 echo "AWS CLI is not installed. Please install it first."
                                 exit 1
