@@ -175,7 +175,7 @@ stage('AWS Cli SetUp for image signing') {
                             echo "AWS credentials updated successfully."
 
                             echo "Creating signer profile"
-                            Profile=$(aws signer get-signing-profile --profile-name usda --ouput json --query 'ProfileName')
+                            Profile=$(aws signer get-signing-profile --profile-name usda --output json --query 'ProfileName')
 
                             if [[ $Profile ]]
                             then
