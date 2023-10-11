@@ -173,6 +173,7 @@ stage('AWS Cli SetUp for image signing') {
                             aws configure set aws_secret_access_key "${AWS_SECRET_KEY}"
 
                             echo "AWS credentials updated successfully."
+                            ls -la 
                             aws s3 ls 
                             echo "Creating signer profile"
                             Profile=$(aws signer get-signing-profile --profile-name usda --output json --query "profileName")
