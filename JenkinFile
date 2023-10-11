@@ -177,7 +177,7 @@ stage('AWS Cli SetUp for image signing') {
                             echo "Creating signer profile"
                             Profile=$(aws signer get-signing-profile --profile-name usda --output json --query "profileName")
 
-                            if [ $Profile -eq "usda" ]
+                            if [ $Profile ]
                             then
                               echo "profile already exists"
                             else
