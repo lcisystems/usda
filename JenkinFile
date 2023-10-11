@@ -13,6 +13,9 @@ pipeline {
               command:
                 - cat
               tty: true
+              volumeMounts:
+                - name: notation
+                  mountPath: /
             - name: maven
               image: maven:3-openjdk-17
               command: 
@@ -38,6 +41,8 @@ pipeline {
               persistentVolumeClaim:
                 claimName: efs-pvc 
             - name: dind-storage
+              emptyDir: {}
+            - name: notation
               emptyDir: {}
         '''    
     }
