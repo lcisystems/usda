@@ -173,10 +173,17 @@ stage('AWS Cli SetUp for image signing') {
                             aws configure set aws_secret_access_key "${AWS_SECRET_KEY}"
 
                             echo "AWS credentials updated successfully."
+
+                            echo "Creating signer profile"
                             aws signer put-signing-profile \
                               --profile-name usda \
                               --platform-id Notation-OCI-SHA384-ECDSA
 
+
+                            echo "Login to ecr with notation cli"
+                            aws ecr get-login-password | notation login \
+                              --username AWS \
+                              --password-stdin "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com"
                           
                         '''
 
