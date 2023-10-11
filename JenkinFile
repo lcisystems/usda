@@ -175,9 +175,17 @@ stage('AWS Cli SetUp for image signing') {
                             echo "AWS credentials updated successfully."
 
                             echo "Creating signer profile"
-                            aws signer put-signing-profile \
-                              --profile-name usda \
-                              --platform-id Notation-OCI-SHA384-ECDSA
+                            Profile=$(aws signer get-signing-profile --profile-name usda --ouput json --query 'ProfileName')
+
+                            if [[ $Profile ]]
+                            then
+                              echo "profile already exists"
+                            else
+                              aws signer put-signing-profile \
+                                --profile-name usda \
+                                --platform-id Notation-OCI-SHA384-ECDSA
+                              echo "profile created successfully"
+                            fi
 
 
                             echo "Login to ecr with notation cli"
