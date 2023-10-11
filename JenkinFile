@@ -153,6 +153,35 @@ pipeline {
         }
     }
   }
+stage('AWS Cli SetUp for image signing') {
+      steps {
+        container('notationcli') {
+          script {
+              withCredentials([[
+                        $class: 'AmazonWebServicesCredentialsBinding',
+                        credentialsId: 's3-profile',
+                        accessKeyVariable: 'AWS_ACCESS_KEY',
+                        secretKeyVariable: 'AWS_SECRET_KEY'
+                    ]]) {
+                        sh '''
+                            #!/bin/bash
+                            if ! command -v aws &> /dev/null; then
+                                echo "AWS CLI is not installed. Please install it first."
+                                exit 1
+                            fi
+
+                            # Set the AWS access key and secret access key
+                            aws configure set aws_access_key_id "${AWS_ACCESS_KEY}"
+                            aws configure set aws_secret_access_key "${AWS_SECRET_KEY}"
+
+                            echo "AWS credentials updated successfully."
+                        '''
+
+                      }
+                    }
+                  }
+                }
+              }
 
     stage('Add AWS Credentials') {
       steps {
