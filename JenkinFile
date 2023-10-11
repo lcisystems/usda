@@ -166,10 +166,6 @@ stage('AWS Cli SetUp for image signing') {
                         sh '''
                             #!/bin/bash
                             aws --version
-                            if ! command aws --version &> /dev/null; then
-                                echo "AWS CLI is not installed. Please install it first."
-                                exit 1
-                            fi
 
                             # Set the AWS access key and secret access key
                             aws configure set aws_access_key_id "${AWS_ACCESS_KEY}"
