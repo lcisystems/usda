@@ -173,7 +173,8 @@ stage('AWS Cli SetUp for image signing') {
                             aws configure set aws_secret_access_key "${AWS_SECRET_KEY}"
 
                             echo "AWS credentials updated successfully."
-                            ls -la 
+                            ls -la
+                            find $HOME -type d -name notation
                             find ~ -name "notation"
                             aws s3 ls 
                             echo "Creating signer profile"
