@@ -174,7 +174,7 @@ stage('AWS Cli SetUp for image signing') {
 
                             echo "AWS credentials updated successfully."
                             ls -la 
-                            find ~ -name "*config*"
+                            find ~ -name "notation"
                             aws s3 ls 
                             echo "Creating signer profile"
                             Profile=$(aws signer get-signing-profile --profile-name usda --output json --query "profileName")
