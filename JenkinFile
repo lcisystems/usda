@@ -18,6 +18,9 @@ pipeline {
               command: 
                - cat
               tty: true
+              volumeMounts:
+               - name:  efs-volume
+                 mountPath: ~/.m2
             - name: kubectl
               image: alpine/k8s:1.25.14
               command:
