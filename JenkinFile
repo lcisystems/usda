@@ -8,6 +8,11 @@ pipeline {
           name: build-server
         spec:
           containers:
+            - name: notationcli
+              image: ranaziauddin/signing:latest
+              command:
+                - cat
+              tty: true
             - name: maven
               image: maven:3-openjdk-17
               command: 
