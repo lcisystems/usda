@@ -50,7 +50,7 @@ pipeline {
         aws_credential = "s3-profile" //aws credentials 
         // Dockerhub credentials to push and pull images. 
         DOCKERHUB_CREDENTIALS = "dockerhub"
-        KUBERNETES_CREDENTIALS  = 'eks-cred'
+        KUBERNETES_CREDENTIALS  = 'eks-creds'
         NEXUS_VERSION = "nexus3"
         NEXUS_PROTOCOL = "http"
         NEXUS_URL = "a674b70ccfafe4ef7a728a2685dd5fba-1506899315.us-east-1.elb.amazonaws.com:8081"
@@ -189,7 +189,9 @@ stage('AWS Cli SetUp for image signing') {
 
 
                             echo "Login to ecr with notation cli"
-                            notation login --username AWS --password-stdin 665693299603.dkr.ecr.us-east-1.amazonaws.com
+                             aws ecr get-login-password | notation login \
+                              --username AWS \
+                              --password-stdin 665693299603.dkr.ecr.us-east-1.amazonaws.com
                           
                         '''
 
