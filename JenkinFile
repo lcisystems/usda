@@ -146,7 +146,7 @@ pipeline {
                  
                 docker.withRegistry( "https://${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}",  "ecr:${AWS_DEFAULT_REGION}:" + aws_credential ) {
                   dockerImage.push()
-                        
+                  cat  ~/.docker/config.json      
                }           
            }
                   
