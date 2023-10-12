@@ -173,7 +173,7 @@ stage('AWS Cli SetUp for image signing') {
                             aws configure set aws_access_key_id "${AWS_ACCESS_KEY}"
                             aws configure set aws_secret_access_key "${AWS_SECRET_KEY}"
                             mkdir -p ~/.docker/
-                            echo '{ "credHelpers": {"665693299603.dkr.ecr.us-east-1.amazonaws.com": "ecr-login"}}' > ~/.docker/config.json
+                            
 
                             echo "AWS credentials updated successfully."
                             find $HOME -type d -name notation
