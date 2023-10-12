@@ -167,6 +167,7 @@ stage('AWS Cli SetUp for image signing') {
                             #!/bin/bash
                             aws --version
                             notation version
+                            notation plugin ls
 
                             # Set the AWS access key and secret access key
                             aws configure set aws_access_key_id "${AWS_ACCESS_KEY}"
