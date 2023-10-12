@@ -171,7 +171,8 @@ stage('AWS Cli SetUp for image signing') {
                             # Set the AWS access key and secret access key
                             aws configure set aws_access_key_id "${AWS_ACCESS_KEY}"
                             aws configure set aws_secret_access_key "${AWS_SECRET_KEY}"
-
+                            echo '{"credsStore": "ecr-login"}' > ~/.docker/config.json
+}
                             echo "AWS credentials updated successfully."
                             find $HOME -type d -name notation
                             find ~ -name "notation"
