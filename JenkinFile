@@ -189,8 +189,7 @@ stage('AWS Cli SetUp for image signing') {
 
 
                             echo "Login to ecr with notation cli"
-                            password=$(aws ecr get-login-password --region us-east-1) 
-                            echo $password | notation login --username AWS --password-stdin 665693299603.dkr.ecr.us-east-1.amazonaws.com
+                            notation login --username AWS --password-stdin 665693299603.dkr.ecr.us-east-1.amazonaws.com
                           
                         '''
 
