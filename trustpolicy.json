@@ -1,0 +1,20 @@
+{
+  "version": "1.0",
+  "trustPolicies": [
+    {
+      "name": "aws-signer-tp",
+      "registryScopes": [
+        "665693299603.dkr.ecr.us-east-1.amazonaws.com/usda_poc"
+      ],
+      "signatureVerification": {
+        "level": "strict"
+      },
+      "trustStores": [
+        "signingAuthority:aws-signer-ts"
+      ],
+      "trustedIdentities": [
+        "arn:aws:signer:us-east-1:665693299603:/signing-profiles/usda_poc"
+      ]
+    }
+  ]
+}
