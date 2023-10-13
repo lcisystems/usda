@@ -165,6 +165,7 @@ stage('AWS Cli SetUp for image signing') {
                     ]]) {
                         sh '''
                             #!/bin/bash
+                            ls -la
                             aws --version
                             notation version
                             notation plugin ls
