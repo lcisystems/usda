@@ -244,18 +244,17 @@ stage('AWS Cli SetUp for image signing') {
                     serverUrl: 'https://BF940C2362D0B0FBF08656E462353508.gr7.us-east-1.eks.amazonaws.com',
                     ]) {
                  sh '''
-                 kubectl delete secret regcred -n team-dev
                  kubectl create secret docker-registry regcred || true \
                   --docker-server=${AWS_ACCOUNT}.dkr.ecr.${AWS_REGION}.amazonaws.com \
                   --docker-username=AWS \
                   --docker-password=$(aws ecr get-login-password) \
-                  --namespace=team-dev
+                  --namespace=team-dev || true && \
                  kubectl get pods --namespace=team-cicd-controlplane
                  kubectl apply -f kubernetes/App1/mysql-pvc.yaml --namespace=team-dev
                  kubectl apply -f kubernetes/App1/mysql-deployment.yaml --namespace=team-dev
                  kubectl apply -f kubernetes/App1/phpmyadmin-deployment.yaml --namespace=team-dev
                  kubectl apply -f kubernetes/App1/tomcat-deployment.yaml --namespace=team-dev
-                 kubectl set image deployment.v1.apps/tomcat-deployment tomcat=665693299603.dkr.ecr.us-east-1.amazonaws.com/usda_poc --namespace=team-dev
+                 kubectl set image deployment.v1.apps/tomcat-deployment tomcat=665693299603.dkr.ecr.us-east-1.amazonaws.com/usda_poc:"${BUILD_NUMBER}.0.0" --namespace=team-dev
 
 
                  ''' 
