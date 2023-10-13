@@ -172,10 +172,6 @@ stage('AWS Cli SetUp for image signing') {
                             # Set the AWS access key and secret access key
                             aws configure set aws_access_key_id "${AWS_ACCESS_KEY}"
                             aws configure set aws_secret_access_key "${AWS_SECRET_KEY}"
-                            mkdir -p ~/.docker/
-                            echo '{\n"credHelpers": {\n "665693299603.dkr.ecr.us-east-1.amazonaws.com": "ecr-login-665693299603"\n }\n}'> ~/.docker/config.json
-                            
-
                             echo "AWS credentials updated successfully."
                             find $HOME -type d -name notation
                             find ~ -name "notation"
@@ -243,6 +239,7 @@ stage('AWS Cli SetUp for image signing') {
                     serverUrl: 'https://BF940C2362D0B0FBF08656E462353508.gr7.us-east-1.eks.amazonaws.com',
                     ]) {
                  sh '''
+                 kubectl delete secret regcred -n team-dev
                  kubectl create secret docker-registry regcred || true \
                   --docker-server=${AWS_ACCOUNT}.dkr.ecr.${AWS_REGION}.amazonaws.com \
                   --docker-username=AWS \
