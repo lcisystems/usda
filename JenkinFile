@@ -192,7 +192,12 @@ stage('AWS Cli SetUp for image signing') {
                              aws ecr get-login-password --region us-east-1 | docker login \
                               --username AWS \
                               --password-stdin 665693299603.dkr.ecr.us-east-1.amazonaws.com
-                          
+                            echo "get image digest"
+                            image_digest=$(aws ecr list-images --repository-name usda_poc --query imageIds[0].imageDigest --output text)
+
+                            echo "sign image"
+                            notation sign 665693299603.dkr.ecr.us-east-1.amazonaws.com/usda_poc @$image_digest --plugin com.amazonaws.signer.notation.plugin --id arn:aws:signer:us-east-1:665693299603:/signing-profiles/usda
+                
                         '''
 
                       }
