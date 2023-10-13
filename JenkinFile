@@ -197,6 +197,9 @@ stage('AWS Cli SetUp for image signing') {
 
                             echo "sign image"
                             notation sign 665693299603.dkr.ecr.us-east-1.amazonaws.com/usda_poc@$image_digest --plugin com.amazonaws.signer.notation.plugin --id arn:aws:signer:us-east-1:665693299603:/signing-profiles/usda_poc
+                            echo "verifying signature.............."
+                            notation inspect 665693299603.dkr.ecr.us-east-1.amazonaws.com/usda_poc\
+                              @$image_digest
                 
                         '''
 
