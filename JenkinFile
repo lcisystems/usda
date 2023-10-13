@@ -201,8 +201,8 @@ stage('AWS Cli SetUp for image signing') {
                             echo "verifying signature.............."
                             notation inspect 665693299603.dkr.ecr.us-east-1.amazonaws.com/usda_poc@$image_digest
                             echo "importing trustpolicy..............."
-                            touch ./root/.config/notation/trustpolicy.json
-                            mv trustpolicy.json ./root/.config/notation/trustpolicy.json
+                            touch /root/.config/notation/trustpolicy.json
+                            mv trustpolicy.json /root/.config/notation/trustpolicy.json
                             notation policy show
                 
                         '''
