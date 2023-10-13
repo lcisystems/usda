@@ -196,17 +196,14 @@ stage('AWS Cli SetUp for image signing') {
                             echo "get image digest"
                             image_digest=$(aws ecr list-images --repository-name usda_poc --query imageIds[0].imageDigest --output text)
 
-                            echo "sign image"
-                            notation sign 665693299603.dkr.ecr.us-east-1.amazonaws.com/usda_poc@$image_digest --plugin com.amazonaws.signer.notation.plugin --id arn:aws:signer:us-east-1:665693299603:/signing-profiles/usda_poc
-                            echo "verifying signature.............."
-                            notation inspect 665693299603.dkr.ecr.us-east-1.amazonaws.com/usda_poc@$image_digest
                             echo "importing trustpolicy..............."
                             touch /root/.config/notation/trustpolicy.json
                             mv trustpolicy.json /root/.config/notation/trustpolicy.json
                             notation policy show
                             echo "verifying using trusted policy................."
-                            notation verify \
-                            665693299603.dkr.ecr.us-east-1.amazonaws.com/usda_poc@$image_digest
+                            notation verify 665693299603.dkr.ecr.us-east-1.amazonaws.com/usda_poc@$image_digest
+                            echo "verifying signature.............."
+                            notation inspect 665693299603.dkr.ecr.us-east-1.amazonaws.com/usda_poc@$image_digest
                 
                         '''
 
