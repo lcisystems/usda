@@ -64,6 +64,14 @@ pipeline {
         v="${BUILD_NUMBER}"
     }
   stages {
+    stages {
+        stage('Debug') {
+            steps {
+                script {
+                    echo "NEXUS_CREDENTIAL_ID: ${NEXUS_CREDENTIAL_ID}"
+                }
+            }
+        }
     stage('Code-Review') {
       steps {
         container('maven') {
