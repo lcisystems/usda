@@ -100,7 +100,7 @@ pipeline {
                             groupId: pom.groupId,
                             version: "${BUILD_NUMBER}.0.0",
                             repository: NEXUS_REPOSITORY,
-                            credentialsId: credentials('nexus-secret-cred'),
+                            credentialsId: 'nexus-secret-cred',
                             artifacts: [
                                 [artifactId: pom.artifactId,
                                 classifier: '',
@@ -122,7 +122,7 @@ pipeline {
   stage('Retrive Artifact from Nexus') {
           steps {
           container('dind') {
-            withCredentials([usernameColonPassword(credentialsId: credentials('nexus-secret-cred')]) {
+            withCredentials([usernameColonPassword(credentialsId: 'nexus-secret-cred']) {
               sh'''
               apk add curl
               curl -u ${NEXUS_CREDENTIAL_ID} -o your_file.png "http://${NEXUS_URL}/repository/nexus-rep0/freeallianceInnovationLab/LoginWebApp/${BUILD_NUMBER}.0.0/LoginWebApp-${BUILD_NUMBER}.0.0.war"
