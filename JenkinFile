@@ -100,7 +100,7 @@ pipeline {
                             groupId: pom.groupId,
                             version: "${BUILD_NUMBER}.0.0",
                             repository: NEXUS_REPOSITORY,
-                            credentialsId: ${NEXUS_CREDENTIAL_ID},
+                            credentialsId: 'nexus-secret-cred',
                             artifacts: [
                                 [artifactId: pom.artifactId,
                                 classifier: '',
