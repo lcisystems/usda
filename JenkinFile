@@ -49,7 +49,7 @@ pipeline {
         //aws credentials                    
         aws_credential = "s3-profile" //aws credentials 
         // Dockerhub credentials to push and pull images. 
-        DOCKERHUB_CREDENTIALS = "dockerhub"
+        DOCKERHUB_CREDENTIALS = credentials('dockerhub')
         KUBERNETES_CREDENTIALS  = 'eks-cred'
         NEXUS_VERSION = "nexus3"
         NEXUS_PROTOCOL = "http"
