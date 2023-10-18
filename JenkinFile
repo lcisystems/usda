@@ -64,7 +64,6 @@ pipeline {
         v="${BUILD_NUMBER}"
     }
   stages {
-    stages {
         stage('Debug') {
             steps {
                 script {
