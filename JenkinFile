@@ -125,7 +125,7 @@ pipeline {
             withCredentials([usernamePassword(credentialsId: 'nexus-secret-cred', usernameVariable: 'NEXUS_CREDENTIAL_ID_USR', passwordVariable: 'NEXUS_CREDENTIAL_ID_PSW')]) {
               sh'''
               apk add curl
-              curl -u ${NEXUS_CREDENTIAL_ID_USR} -o your_file.png "http://${NEXUS_URL}/repository/nexus-rep0/freeallianceInnovationLab/LoginWebApp/${BUILD_NUMBER}.0.0/LoginWebApp-${BUILD_NUMBER}.0.0.war"
+              curl -u ${NEXUS_CREDENTIAL_ID} -o your_file.png "http://${NEXUS_URL}/repository/nexus-rep0/freeallianceInnovationLab/LoginWebApp/${BUILD_NUMBER}.0.0/LoginWebApp-${BUILD_NUMBER}.0.0.war"
               '''
             }
           }
