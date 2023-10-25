@@ -9,22 +9,22 @@ pipeline {
         spec:
           containers:
             - name: notationcli
-              image: ranaziauddin/signing:latest
+              image: 665693299603.dkr.ecr.us-east-1.amazonaws.com/notationcli:1.0.0
               command:
                 - cat
               tty: true
             - name: maven
-              image: maven:3-openjdk-17
+              image: 665693299603.dkr.ecr.us-east-1.amazonaws.com/maven:1.0.0
               command: 
                - cat
               tty: true
             - name: kubectl
-              image: alpine/k8s:1.25.14
+              image: 665693299603.dkr.ecr.us-east-1.amazonaws.com/kubectl:1.0.0
               command:
                 - cat
               tty: true
             - name: dind
-              image: docker:20-dind
+              image: 665693299603.dkr.ecr.us-east-1.amazonaws.com/dockerdind:1.0.0
               securityContext:
                 privileged: true
               volumeMounts:
