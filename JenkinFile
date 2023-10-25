@@ -8,6 +8,11 @@ pipeline {
           name: build-server
         spec:
           containers:
+            - name: jnlp
+              image: 665693299603.dkr.ecr.us-east-1.amazonaws.com/jnlp:1.0.0
+              command:
+                - cat
+              tty: true
             - name: notationcli
               image: 665693299603.dkr.ecr.us-east-1.amazonaws.com/notationcli:1.0.0
               command:
