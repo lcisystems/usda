@@ -8,7 +8,6 @@ pipeline {
           name: build-server
         spec:
           containers:
-              tty: true
             - name: notationcli
               image: ranaziauddin/signing:latest
               command:
