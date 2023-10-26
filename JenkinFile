@@ -114,7 +114,7 @@ pipeline {
             }
         }
      }
-   }
+   
   stage('Retrive Artifact from Nexus') {
           steps {
           container('dind') {
