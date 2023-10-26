@@ -134,6 +134,7 @@ pipeline {
                         
                         echo "Username: ${username}"
                         echo "Password: ${password}"
+            }
                         
             withCredentials([usernamePassword(credentialsId: 'nexus-secret-cred', usernameVariable: 'NEXUS_CREDENTIAL_ID_USR', passwordVariable: 'NEXUS_CREDENTIAL_ID_PSW')]) {
               sh'''
