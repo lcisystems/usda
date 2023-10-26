@@ -87,6 +87,9 @@ pipeline {
             steps {
             container('maven') {
                     script {
+                    withCredentials([usernamePassword(credentialsId: 'nexus-secret-cred', usernameVariable: 'NEXUS_CREDENTIAL_ID_USR', passwordVariable: 'NEXUS_CREDENTIAL_ID_PSW')]) {
+                    def username = env.NEXUS_CREDENTIAL_ID_USR
+                    def password = env.NEXUS_CREDENTIAL_ID_PSW
                     def pom = readMavenPom(file: 'pom.xml');
                     filesByGlob = findFiles(glob: "target/*.${pom.packaging}");
                     echo "${filesByGlob[0].name} ${filesByGlob[0].path} ${filesByGlob[0].directory} ${filesByGlob[0].length} ${filesByGlob[0].lastModified}"
@@ -101,7 +104,9 @@ pipeline {
                             groupId: pom.groupId,
                             version: "${BUILD_NUMBER}.0.0",
                             repository: NEXUS_REPOSITORY,
-                            credentialsId: 'nexus-secret-cred',
+                            credentialsId: '',
+                            username: env.NEXUS_CREDENTIAL_ID_USR,
+                            password: NEXUS_CREDENTIAL_ID_PSW,
                             artifacts: [
                                 [artifactId: pom.artifactId,
                                 classifier: '',
@@ -120,6 +125,7 @@ pipeline {
             }
         }
      }
+   }
   stage('Retrive Artifact from Nexus') {
           steps {
           container('dind') {
