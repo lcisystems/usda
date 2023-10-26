@@ -123,23 +123,11 @@ pipeline {
   stage('Retrive Artifact from Nexus') {
           steps {
           container('dind') {
-            withAWS(region: AWS_REGION, credentials: 's3-profile') {
-                        // Use the AWS Secrets Manager plugin to retrieve the secret
-                        def secretValue = aws_secrets_manager.read(secretId: nexus-secret-cred)
-                        
-                        // Parse the secret value (assuming it's JSON)
-                        def secretJson = readJSON text: secretValue
-                        def username = secretJson.username
-                        def password = secretJson.password
-                        
-                        echo "Username: ${username}"
-                        echo "Password: ${password}"
-            }
-                        
             withCredentials([usernamePassword(credentialsId: 'nexus-secret-cred', usernameVariable: 'NEXUS_CREDENTIAL_ID_USR', passwordVariable: 'NEXUS_CREDENTIAL_ID_PSW')]) {
+              def username = env.NEXUS_CREDENTIAL_ID_USR
               sh'''
               apk add curl
-              curl -u ${NEXUS_CREDENTIAL_ID} -o your_file.png "http://${NEXUS_URL}/repository/nexus-rep0/freeallianceInnovationLab/LoginWebApp/${BUILD_NUMBER}.0.0/LoginWebApp-${BUILD_NUMBER}.0.0.war"
+              curl -u ${username} -o your_file.png "http://${NEXUS_URL}/repository/nexus-rep0/freeallianceInnovationLab/LoginWebApp/${BUILD_NUMBER}.0.0/LoginWebApp-${BUILD_NUMBER}.0.0.war"
               '''
             }
           }
