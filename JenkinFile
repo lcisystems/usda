@@ -95,7 +95,7 @@ pipeline {
                             groupId: pom.groupId,
                             version: "${BUILD_NUMBER}.0.0",
                             repository: NEXUS_REPOSITORY,
-                            credentialsId: 'nexus-creds',
+                            credentialsId: NEXUS_CREDENTIAL_ID,
                             artifacts: [
                                 [artifactId: pom.artifactId,
                                 classifier: '',
