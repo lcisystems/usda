@@ -253,7 +253,7 @@ stage('AWS Cli SetUp for image signing') {
       steps {
         container('kubectl') {
           withKubeConfig([credentialsId: "${KUBERNETES_CREDENTIALS}" ,
-                    serverUrl: 'https://BF940C2362D0B0FBF08656E462353508.gr7.us-east-1.eks.amazonaws.com',
+                    serverUrl: 'https://B0D9665F50FC1CF0D67B6D0FE343D0B0.gr7.us-east-1.eks.amazonaws.com',
                     ]) {
                  sh '''
                  kubectl create secret docker-registry regcred || true \
