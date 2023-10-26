@@ -106,7 +106,7 @@ pipeline {
                             repository: NEXUS_REPOSITORY,
                             credentialsId: '',
                             username: env.NEXUS_CREDENTIAL_ID_USR,
-                            password: NEXUS_CREDENTIAL_ID_PSW,
+                            password: env.NEXUS_CREDENTIAL_ID_PSW,
                             artifacts: [
                                 [artifactId: pom.artifactId,
                                 classifier: '',
