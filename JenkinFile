@@ -123,6 +123,7 @@ pipeline {
   stage('Retrive Artifact from Nexus') {
           steps {
           container('dind') {
+            script {
             withCredentials([usernamePassword(credentialsId: 'nexus-secret-cred', usernameVariable: 'NEXUS_CREDENTIAL_ID_USR', passwordVariable: 'NEXUS_CREDENTIAL_ID_PSW')]) {
               def username = env.NEXUS_CREDENTIAL_ID_USR
               sh'''
@@ -133,6 +134,7 @@ pipeline {
           }
         }
       }
+     }
      
   stage('Buid Docker Image') {
           steps {
