@@ -71,8 +71,8 @@ pipeline {
                     withCredentials([usernamePassword(credentialsId: 'nexus-creds', usernameVariable: 'NEXUS_CREDENTIAL_ID_USR', passwordVariable: 'NEXUS_CREDENTIAL_ID_PSW')]) {
                     def username = env.NEXUS_CREDENTIAL_ID_USR
                     def password = env.Ne
-                    echo "${usename}
-                    echo "{password}
+                    echo "${usename}"
+                    echo "${password}"
         
                     echo "NEXUS_CREDENTIAL_ID: ${NEXUS_CREDENTIAL_ID}"
                 }
