@@ -104,14 +104,14 @@ pipeline {
                             groupId: pom.groupId,
                             version: "${BUILD_NUMBER}.0.0",
                             repository: NEXUS_REPOSITORY,
-                            credentialsId: 'NEXUS_CREDENTIAL_ID',
+                            credentialsId: '',
                             artifacts: [
                                 [artifactId: pom.artifactId,
                                 classifier: '',
                                 file: artifactPath,
                                 type: pom.packaging],
                                 [artifactId: pom.artifactId,
-                                classifier: '',
+                                classifier: 'nexus-secret-cred',
                                 file: "pom.xml",
                                 type: "pom"]
                             ]
