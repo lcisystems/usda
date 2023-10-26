@@ -81,9 +81,6 @@ pipeline {
             steps {
             container('maven') {
                     script {
-                    withCredentials([usernamePassword(credentialsId: 'nexus-secret-cred', usernameVariable: 'NEXUS_CREDENTIAL_ID_USR', passwordVariable: 'NEXUS_CREDENTIAL_ID_PSW')]) {
-                    def username = env.NEXUS_CREDENTIAL_ID_USR
-                    def password = env.NEXUS_CREDENTIAL_ID_PSW
                     def pom = readMavenPom(file: 'pom.xml');
                     filesByGlob = findFiles(glob: "target/*.${pom.packaging}");
                     echo "${filesByGlob[0].name} ${filesByGlob[0].path} ${filesByGlob[0].directory} ${filesByGlob[0].length} ${filesByGlob[0].lastModified}"
@@ -122,7 +119,7 @@ pipeline {
           steps {
           container('dind') {
             script {
-            withCredentials([usernamePassword(credentialsId: 'nexus-secret-cred', usernameVariable: 'NEXUS_CREDENTIAL_ID_USR', passwordVariable: 'NEXUS_CREDENTIAL_ID_PSW')]) {
+            withCredentials([usernamePassword(credentialsId: 'nexus-creds', usernameVariable: 'NEXUS_CREDENTIAL_ID_USR', passwordVariable: 'NEXUS_CREDENTIAL_ID_PSW')]) {
               def username = env.NEXUS_CREDENTIAL_ID_USR
               sh'''
               apk add curl
