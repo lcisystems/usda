@@ -54,7 +54,7 @@ pipeline {
         NEXUS_PROTOCOL = "http"
         NEXUS_URL = "a9e10564de20542479ec77dc20e4b01d-596046380.us-east-1.elb.amazonaws.com:8081"
         NEXUS_REPOSITORY = "nexus-rep0"
-        NEXUS_CREDENTIAL_ID = credentials('nexus-secret-un')
+        NEXUS_CREDENTIAL_ID = 'nexus-secret-un'
         AWS_ACCOUNT_ID="665693299603"
         AWS_DEFAULT_REGION="us-east-1" 
         IMAGE_REPO_NAME="usda_poc"
