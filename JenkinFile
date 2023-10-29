@@ -68,7 +68,7 @@ pipeline {
     stage('Code-Review') {
       steps {
         container('maven') {
-          withSonarQubeEnv(installationName: 'Sonar', credentialsId: 'sonarqube-secret') {
+          withSonarQubeEnv(installationName: 'Sonar', credentialsId: 'sonarqube') {
                 sh 'java -version'
                 sh 'mvn -B -DskipTests clean package -Dv=${BUILD_NUMBER} sonar:sonar'
           }
