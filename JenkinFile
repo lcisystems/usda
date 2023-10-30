@@ -265,7 +265,6 @@ stage('AWS Cli SetUp for image signing') {
                  kubectl apply -f TestApplication/mysql-deployment.yaml --namespace=team-dev
                  kubectl apply -f TestApplication/phpmyadmin-deployment.yaml --namespace=team-dev
                  kubectl apply -f TestApplication/tomcat-deployment.yaml --namespace=team-dev
-                 kubectl set image deployment.v1.apps/tomcat-deployment tomcat=665693299603.dkr.ecr.us-east-1.amazonaws.com/usda_poc:"${BUILD_NUMBER}.0.0" --namespace=team-dev
 
 
                  ''' 
