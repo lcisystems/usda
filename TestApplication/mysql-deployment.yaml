@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+        - name: mysql
+          image: mysql:5.7
+          resources:
+            # limits:
+            #   memory: "2Gi"
+            #   cpu: "500m"
+            # requests:
+            #   memory: "1Gi"
+            #   cpu: "250m"  # Reduced CPU request, as MySQL typically doesn't need 1 full core
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: root
+            - name: MYSQL_DATABASE
+              value: testdb1
+            - name: MYSQL_USER
+              value: testuser
+            - name: MYSQL_PASSWORD
+              value: root
+          ports:
+            - containerPort: 3306
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-service
+spec:
+  selector:
+    app: mysql
+  ports:
+    - protocol: TCP
+      port: 3306
+      targetPort: 3306
+  type: LoadBalancer
