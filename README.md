@@ -115,7 +115,7 @@ This guide will help you install the AWS CLI, along with some essential utilitie
 
 This guide provides instructions for deploying a cluster, configuring the AWS CLI, and gaining access to an Amazon Elastic Kubernetes Service (EKS) cluster.
 
-## Deployment
+## 1. Deployment
 
 1. **Configure AWS CLI**: First, add your AWS access keys and secret access keys using the following command:
 
@@ -141,22 +141,22 @@ This guide provides instructions for deploying a cluster, configuring the AWS CL
    ```
    Description: cdk deploy will deploy the cluster using the CloudFormation template prepared earlier
 
-# Accessing the Cluster
+# 2. Accessing the Cluster
 
-After the stack deployment is complete, you will have a working EKS cluster deployed in the `us-west-2` region. You can access the cluster both via the CLI and the AWS Management Console.
+After the stack deployment is complete, you will have a working EKS cluster deployed in the `required` region. You can access the cluster both via the CLI and the AWS Management Console.
 
 ## Setting up kubectl Access
 
 To gain access to the cluster using the CLI, you need to update your `kubeconfig` file using `kubectl`. You will find a command in one of the stack outputs that resulted from the deployment, which should look similar to the following:
 
 ```
-cluster-stack.clusterstackConfigCommand3CE2A6DC = aws eks update-kubeconfig --name cluster-stack --region us-west-2 --role-arn arn:aws:iam::123456789012:role/
+cluster-stack.clusterstackConfigCommand3CE2A6DC = aws eks update-kubeconfig --name cluster-stack --region <region> --role-arn arn:aws:iam::123456789012:role/
 ```
 
-You can run this command (replace the role ARN with the one that matches your account):
+You can run this command (replace the role ARN with the one that matches your account) and (region in which the deployment was carried out):
 
 ```
-  aws eks update-kubeconfig --name cluster-stack --region us-west-2 --role-arn arn:aws:iam::123456789012:role/
+  aws eks update-kubeconfig --name cluster-stack --region <region> --role-arn arn:aws:iam::123456789012:role/
 ```
 In case you cleared your terminal or exited and re-entered your browser, you can find and apply the config command with the following:
 
@@ -170,6 +170,155 @@ Once the kubeconfig has been updated, you should be able to access the EKS clust
   kubectl get svc
 ```
 This command will display information about the services in the EKS cluster, including their names, types, cluster IPs, external IPs, ports, and age.
+
+
+## Update the Role for efs mount target creation
+
+1. Go to the console and find the role created by the cluster for csi driver
+
+2. Click on Edit role
+
+3. Replace the existing policy with the following json policy:
+
+   ```
+      {
+     "Version": "2012-10-17",
+     "Statement": [
+       {
+         "Effect": "Allow",
+         "Action": [
+           "elasticfilesystem:DescribeAccessPoints",
+           "elasticfilesystem:DescribeFileSystems",
+           "elasticfilesystem:DescribeMountTargets",
+           "ec2:DescribeAvailabilityZones"
+         ],
+         "Resource": "*"
+       },
+       {
+         "Effect": "Allow",
+         "Action": [
+           "elasticfilesystem:CreateAccessPoint"
+         ],
+         "Resource": "*",
+         "Condition": {
+           "StringLike": {
+             "aws:RequestTag/efs.csi.aws.com/cluster": "true"
+           }
+         }
+       },
+       {
+         "Effect": "Allow",
+         "Action": [
+           "elasticfilesystem:TagResource"
+         ],
+         "Resource": "*",
+         "Condition": {
+           "StringLike": {
+             "aws:ResourceTag/efs.csi.aws.com/cluster": "true"
+           }
+         }
+       },
+       {
+         "Effect": "Allow",
+         "Action": "elasticfilesystem:DeleteAccessPoint",
+         "Resource": "*",
+         "Condition": {
+           "StringEquals": {
+             "aws:ResourceTag/efs.csi.aws.com/cluster": "true"
+           }
+         }
+       }
+     ]
+   }
+   ```
+4. Click Save
+
+
+## Create EFS File Access Point 
+
+AWS EFS Access Points simplify client access to EFS file systems, providing user and group-level permissions, root directory permissions, and integration with IAM. They are particularly useful for isolating users, applications, and directories on shared file systems, enhancing security, and ensuring fine-grained control without relying on NFSv4.1 ACLs.
+
+Create the access points for the following application 
+   1. Nexus
+   2. SonarQube
+   3. Jenkins
+
+**Note:** Single Access pint can be created to give access to all three applications. But is recommended and is counted as a best practice to separate the access points. 
+
+To create the access point Run the following commands:
+
+You can run this command (replace the file-system-id with what you have for your EFS file sytem):
+
+```
+aws efs create-access-point --file-system-id <your file system ID> --posix-user Uid=1000,Gid=1000 --root-directory "Path=/jenkins,CreationInfo={OwnerUid=1000,OwnerGid=1000,Permissions=777}"
+```
+```
+aws efs create-access-point --file-system-id <your file system ID> --posix-user Uid=1000,Gid=1000 --root-directory "Path=/nexus,CreationInfo={OwnerUid=1000,OwnerGid=1000,Permissions=777}"
+```
+```
+aws efs create-access-point --file-system-id <your file system ID> --posix-user Uid=1000,Gid=1000 --root-directory "Path=/sonarqube,CreationInfo={OwnerUid=1000,OwnerGid=1000,Permissions=777}"
+```
+
+
+# 3. Sign Container Images for deployment in AWS EKS CLUSTER 
+
+To sign images find the solution under python-scripts folder. The readme provided in the folder will help you do signing of the images that are needed to be deployed inside the cluster. 
+
+# 4. Configure Cluster with Gatekeeper and Ratify to reject deployments of unverified images
+
+To configure the cluster find the solution under the config folder. The readme provided in the folder provides step-by-step guidance for deployment. 
+
+# 5. Deploy Jenkins 
+
+To deploy Jenkins as deployment in the AWS EKS cluster find the YAML files and scripts under the Jenkins folder. The readme provided in the folder provides step-by-step guidance for the deployment
+
+# 6. Configure Jenkins to Retrieve secrets From AWS Secret Manager 
+
+# Prerequisites
+  AWS CLI 
+1. **Create IAM Policy**
+   - Login to aws console
+   - Create an IAM Policy
+     ```
+        {
+       "Version": "2012-10-17",
+       "Statement": [
+           {
+               "Sid": "AllowJenkinsToGetSecretValues",
+               "Effect": "Allow",
+               "Action": "secretsmanager:GetSecretValue",
+               "Resource": "*"
+           },
+           {
+               "Sid": "AllowJenkinsToListSecrets",
+               "Effect": "Allow",
+               "Action": "secretsmanager:ListSecrets"
+           },
+           {
+               "Sid": "AllowJenkinsToAccessKMSKEY",
+               "Effect": "Allow",
+               "Action": "kms:*"
+               "Resource": "*"
+           }
+       ]
+   }
+     ```
+2. Attach this Policy to an IAM User
+3. Login to Jenkins Server
+4. Install Plugin (AWS Secrets Manager Credentials Provider)
+5. Configure the plugin under System Configuration
+6. Provide the access key and secret Access key for the IAM user who has permission to access the AWS Secret Manager
+
+Now when you create a secret in AWS Secret Manager Jenkins will capture that secret and it will appear inside Jenkins credentials 
+
+# 7. Deploy SonarQube 
+
+To deploy SonarQube as Kubernetes deployment find the YAML file and scripts under sonarqube folder. The readme provided in the folder provides step-by-step guidance for the deployment
+
+# 8. Deploy Nexus 
+
+To deploy Nexus as Kubernetes deployment find the YAML file and scripts under nexus folder. The readme provided in the folder provides step-by-step guidance for the deployment
+
 
 
 
