@@ -1,0 +1,15 @@
+# Requirements for Python project
+
+# Standard libraries
+boto3
+json
+botocore
+
+# Third-party libraries
+pyyaml
+
+# Python built-in libraries
+ssl
+urllib3
+subprocess
+os

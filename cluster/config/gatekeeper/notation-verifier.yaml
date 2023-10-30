@@ -1,0 +1,32 @@
+apiVersion: config.ratify.deislabs.io/v1beta1
+kind: Verifier
+metadata:
+  name: verifier-notation
+spec:
+  name: notation
+  artifactTypes: application/vnd.cncf.notary.signature
+  parameters:
+    verificationCertStores:
+      certs:
+        - ratify-notation-inline-cert
+    trustPolicyDoc:
+      version: "1.0"
+      trustPolicies:
+        - name: default
+          registryScopes:
+            - "*"
+          signatureVerification:
+            level: strict
+          trustStores:
+            - signingAuthority:certs
+          trustedIdentities:
+            - arn:aws:signer:us-east-1:665693299603:/signing-profiles/mysqlprofile
+            - arn:aws:signer:us-east-1:665693299603:/signing-profiles/jenkinsprofile
+            - arn:aws:signer:us-east-1:665693299603:/signing-profiles/nexusprofile
+            - arn:aws:signer:us-east-1:665693299603:/signing-profiles/postgresprofile
+            - arn:aws:signer:us-east-1:665693299603:/signing-profiles/sonarqubeprofile
+            - arn:aws:signer:us-east-1:665693299603:/signing-profiles/notationcliprofile
+            - arn:aws:signer:us-east-1:665693299603:/signing-profiles/mavenprofile
+            - arn:aws:signer:us-east-1:665693299603:/signing-profiles/kubectlprofile
+            - arn:aws:signer:us-east-1:665693299603:/signing-profiles/dockerdindprofile
+            - arn:aws:signer:us-east-1:665693299603:/signing-profiles/jnlpprofile

@@ -1,0 +1,2 @@
+aws iam create-policy --policy-name signerGetRevocationStatus --policy-document file://signer_policy.json
+aws iam create-role -role-name signer_role -assume-role-policy-document file://Test-Role-Trust-Policy.json

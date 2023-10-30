@@ -1,0 +1,41 @@
+version: v1 
+accounts:
+- name: 665693299603
+  region: us-east-1
+  baseimages:
+    - name: sonarqube:lts-community
+      tag: 1.0.0
+      ecrrepo: sonarqube
+    - name: jenkins/jenkins:lts
+      tag: 1.0.0
+      ecrrepo: jenkins
+    - name: sonatype/nexus3:latest
+      tag: 1.0.0
+      ecrrepo: nexus
+    - name: ranaziauddin/signing:latest
+      tag: 1.0.0
+      ecrrepo: notationcli
+    - name: maven:3-openjdk-17
+      tag: 1.0.0
+      ecrrepo: maven
+    - name: alpine/k8s:1.25.14
+      tag: 1.0.0
+      ecrrepo: kubectl
+    - name: docker:dind 
+      tag: 1.0.0
+      ecrrepo: dockerdind 
+    - name: phpmyadmin/phpmyadmin
+      tag: 1.0.0
+      ecrrepo: phpadmin 
+    - name: tomcat:latest
+      tag: 1.0.0
+      ecrrepo: tomcat 
+    - name: mysql:5.7 
+      tag: 1.0.0
+      ecrrepo: mysql
+    - name: postgres:14
+      tag: 1.0.0
+      ecrrepo: postgres
+    - name: jenkins/inbound-agent:latest
+      tag: 1.0.0
+      ecrrepo: jnlp

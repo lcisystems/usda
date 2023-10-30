@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nexus
+  namespace: team-cicd-controlplane
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nexus-server
+  template:
+    metadata:
+      labels:
+        app: nexus-server
+    spec:
+      containers:
+        - name: nexus
+          image: 665693299603.dkr.ecr.us-east-1.amazonaws.com/nexus:1.0.0
+          # resources:
+          #   limits:
+          #     memory: "4Gi"
+          #     cpu: "1000m"
+          #   requests:
+          #     memory: "2Gi"
+          #     cpu: "500m"
+          ports:
+            - containerPort: 8081
+          volumeMounts:
+            - name: efs-volume
+              mountPath: /nexus-data
+      imagePullSecrets:
+        - name: regcred
+      volumes:
+        - name: efs-volume
+          persistentVolumeClaim:
+              claimName: efs-nexus-claim
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nexus-service
+  namespace: team-cicd-controlplane
+  annotations:
+      prometheus.io/scrape: 'true'
+      prometheus.io/path:   /
+      prometheus.io/port:   '8081'
+spec:
+  selector: 
+    app: nexus-server
+  type: LoadBalancer
+  ports:
+    - port: 8081
+      targetPort: 8081
