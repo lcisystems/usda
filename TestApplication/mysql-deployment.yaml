@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: mysql
-          image: mysql:5.7
+          image: 665693299603.dkr.ecr.us-east-1.amazonaws.com/mysql:1.0.0
           resources:
             # limits:
             #   memory: "2Gi"
