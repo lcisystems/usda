@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: phpmyadmin
-          image: phpmyadmin/phpmyadmin
+          image: 665693299603.dkr.ecr.us-east-1.amazonaws.com/usda_poc:1.0.0
           env:
             - name: PMA_HOST
               value: mysql-service
@@ -22,6 +22,8 @@ spec:
               value: root
           ports:
             - containerPort: 80
+      imagePullSecrets:
+        - name: regcred
 ---
 apiVersion: v1
 kind: Service
