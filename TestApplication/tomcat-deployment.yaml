@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: tomcat
-          image: 665693299603.dkr.ecr.us-east-1.amazonaws.com/usda_poc:${BUILD_NUMBER}
+          image: 665693299603.dkr.ecr.us-east-1.amazonaws.com/usda_poc:1.0.0
           env:
             - name: MYSQL_ROOT_PASSWORD
               value: root
