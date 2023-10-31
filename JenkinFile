@@ -99,6 +99,7 @@ pipeline {
             steps {
             container('maven') {
                     script {
+                    print(ARTIFACTORY)
                     def pom = readMavenPom(file: 'pom.xml');
                     filesByGlob = findFiles(glob: "target/*.${pom.packaging}");
                     echo "${filesByGlob[0].name} ${filesByGlob[0].path} ${filesByGlob[0].directory} ${filesByGlob[0].length} ${filesByGlob[0].lastModified}"
@@ -113,7 +114,7 @@ pipeline {
                             groupId: pom.groupId,
                             version: "${BUILD_NUMBER}.0.0",
                             repository: NEXUS_REPOSITORY,
-                            credentialsId: ARTIFACTORY,
+                            credentialsId: NEXUS_CREDENTIAL_ID ,
                             artifacts: [
                                 [artifactId: pom.artifactId,
                                 classifier: '',
