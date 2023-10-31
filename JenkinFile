@@ -58,20 +58,20 @@ pipeline {
         SONAR_QUBE_INSTALLATION_NAME='Sonar'
         SONAR_QUBE_CREDENTIALS_ID = 'sonarqube'
 
-        NEXUS_VERSION = "nexus3"
-        NEXUS_PROTOCOL = "HTTP"
-        NEXUS_URL = "a9e10564de20542479ec77dc20e4b01d-596046380.us-east-1.elb.amazonaws.com:8081"
-        NEXUS_REPOSITORY = "nexus-rep0"
+        NEXUS_VERSION = 'nexus3'
+        NEXUS_PROTOCOL = 'HTTP'
+        NEXUS_URL = 'a9e10564de20542479ec77dc20e4b01d-596046380.us-east-1.elb.amazonaws.com:8081'
+        NEXUS_REPOSITORY = 'nexus-rep0'
         NEXUS_CREDENTIAL_ID = 'nexus-secret'
 
 
-        AWS_ACCOUNT_ID="665693299603"
-        AWS_DEFAULT_REGION="us-east-1" 
+        AWS_ACCOUNT_ID='665693299603'
+        AWS_DEFAULT_REGION='us-east-1' 
 
-        IMAGE_REPO_NAME="usda_poc"
-        IMAGE_TAG="latest"
-
-        REPOSITORY_URI = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}"
+        IMAGE_REPO_NAME = 'usda_poc'
+        IMAGE_TAG='latest'
+        AWS_SIGNER_PROFILE_NAME = 'usda_poc'
+        REPOSITORY_URI = '${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}'
         v="${BUILD_NUMBER}"
     }
   stages {    
@@ -180,7 +180,6 @@ stage('AWS Cli SetUp for image signing') {
                     ]]) {
                         sh '''
                             #!/bin/bash
-                            ls -la
                             aws --version
                             notation version
                             notation plugin ls
@@ -189,32 +188,30 @@ stage('AWS Cli SetUp for image signing') {
                             aws configure set aws_access_key_id "${AWS_ACCESS_KEY}"
                             aws configure set aws_secret_access_key "${AWS_SECRET_KEY}"
                             echo "AWS credentials updated successfully."
-                            find $HOME -type d -name notation
-                            find ~ -name "notation"
-                            aws s3 ls 
+
                             echo "Creating signer profile"
-                            Profile=$(aws signer get-signing-profile --profile-name usda_poc --output json --query "profileName")
+                            Profile=$(aws signer get-signing-profile --profile-name "${AWS_SIGNER_PROFILE_NAME}" --output json --query "profileName")
 
                             if [ $Profile ]
                             then
                               echo "profile already exists"
                             else
-                              aws signer put-signing-profile --profile-name usda_poc --platform-id Notation-OCI-SHA384-ECDSA
+                              aws signer put-signing-profile --profile-name "${AWS_SIGNER_PROFILE_NAME}" --platform-id Notation-OCI-SHA384-ECDSA
                               echo "profile created successfully"
                             fi
 
 
                             echo "Login to ecr with notation cli"
-                             aws ecr get-login-password --region us-east-1 | docker login \
+                             aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login \
                               --username AWS \
-                              --password-stdin 665693299603.dkr.ecr.us-east-1.amazonaws.com
+                              --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com
                             echo "get image digest"
-                            image_digest=$(aws ecr list-images --repository-name usda_poc --query imageIds[0].imageDigest --output text)
+                            image_digest=$(aws ecr list-images --repository-name ${} --query imageIds[0].imageDigest --output text)
 
                             echo "sign image"
-                            notation sign 665693299603.dkr.ecr.us-east-1.amazonaws.com/usda_poc@$image_digest --plugin com.amazonaws.signer.notation.plugin --id arn:aws:signer:us-east-1:665693299603:/signing-profiles/usda_poc
+                            notation sign ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}@$image_digest --plugin com.amazonaws.signer.notation.plugin --id arn:aws:signer:us-east-1:665693299603:/signing-profiles/usda_poc
                             echo "verifying signature.............."
-                            notation inspect 665693299603.dkr.ecr.us-east-1.amazonaws.com/usda_poc@$image_digest
+                            notation inspect ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}@$image_digest
                             echo "importing trustpolicy..............."
                             touch /root/.config/notation/trustpolicy.json
                             mv trustpolicy.json /root/.config/notation/trustpolicy.json
