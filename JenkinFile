@@ -92,7 +92,29 @@ pipeline {
     }
 
 
-      
+   stage('Create Nexus Credentials') {
+          steps {
+            script {
+              def jenkinsKeyUsernameWithPasswordParameters = [
+                description:  'nexus secret',
+                id:           'nexus-secret-value',
+                secret:        "${env.ARTIFACTORY_PSW}",
+                userName:     "${env.ARTIFACTORY_USR}"
+              ]
+              domain = com.cloudbees.plugins.credentials.domains.Domain.global()
+              store = Jenkins.instance.getExtensionList('com.cloudbees.plugins.credentials.SystemCredentialsProvider')[0].getStore()
+              def jenkinsKeyUsernameWithPassword = new UsernamePasswordCredentialsImpl(
+                CredentialsScope.GLOBAL,
+                jenkinsKeyUsernameWithPasswordParameters.id,
+                jenkinsKeyUsernameWithPasswordParameters.description,
+                jenkinsKeyUsernameWithPasswordParameters.userName,
+                jenkinsKeyUsernameWithPasswordParameters.secret
+              )
+              store.addCredentials(domain, jenkinsKeyUsernameWithPassword)
+          }
+        }
+      }
+     }
     
     
   stage("Publish to Nexus Repository Manager") {
