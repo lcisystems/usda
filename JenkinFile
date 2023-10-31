@@ -108,8 +108,7 @@ pipeline {
                 secret:        "${env.ARTIFACTORY_PSW}",
                 userName:     "${env.ARTIFACTORY_USR}"
               ]
-              // get Jenkins instance
-              Jenkins jenkins = Jenkins.getInstance()
+              
               
               // get credentials domain
               def domain = Domain.global()
