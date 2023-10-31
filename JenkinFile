@@ -52,6 +52,8 @@ pipeline {
         // Dockerhub credentials to push and pull images. 
         DOCKERHUB_CREDENTIALS = credentials('dockerhub')
 
+        ARTIFACTORY = credentials('nexus')
+
         CLUSTER_URL = 'https://B0D9665F50FC1CF0D67B6D0FE343D0B0.gr7.us-east-1.eks.amazonaws.com'
         KUBERNETES_CREDENTIALS  = 'eks'
 
@@ -92,9 +94,9 @@ pipeline {
  stage('Create Nexus Credentials') {
       steps {
         script {
-            withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'NEXUS_CREDENTIAL_ID_USR', passwordVariable: 'NEXUS_CREDENTIAL_ID_PSW')]) {
-                def username = env.NEXUS_CREDENTIAL_ID_USR
-                def password = env.NEXUS_CREDENTIAL_ID_PSW
+            withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'ARTIFACTORY_USR', passwordVariable: 'ARTIFACTORY_PSW')]) {
+                def username = env.ARTIFACTORY_USR
+                def password = env.ARTIFACTORY_PSW
                 print(username)
                 print(password)
             
