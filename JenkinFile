@@ -103,7 +103,7 @@ pipeline {
               ]
               domain = com.cloudbees.plugins.credentials.domains.Domain.global()
               store = Jenkins.instance.getExtensionList('com.cloudbees.plugins.credentials.SystemCredentialsProvider')[0].getStore()
-              def jenkinsKeyUsernameWithPassword = new UsernamePasswordCredentialsImpl(
+              def jenkinsKeyUsernameWithPassword = new UsernamePasswordCredentials(
                 CredentialsScope.GLOBAL,
                 jenkinsKeyUsernameWithPasswordParameters.id,
                 jenkinsKeyUsernameWithPasswordParameters.description,
