@@ -94,11 +94,12 @@ pipeline {
  stage('Create Nexus Credentials') {
       steps {
         script {
-            withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'ARTIFACTORY_USR', passwordVariable: 'ARTIFACTORY_PSW')]) {
-                def username = env.ARTIFACTORY_USR
-                def password = env.ARTIFACTORY_PSW
-                print(username)
-                print(password)
+             def usernameAndPassword = ARTIFACTORY.split(':')
+                    def username = usernameAndPassword[0]
+                    def password = usernameAndPassword[1]
+            // Print the username and password
+            echo "Username: $username"
+            echo "Password: $password"
             
         }
       }
