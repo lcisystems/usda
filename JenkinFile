@@ -54,7 +54,8 @@ pipeline {
         KUBERNETES_CREDENTIALS  = 'eks'
         SONAR_QUBE_CREDENTIALS_ID = 'sonarqube'
         NEXUS_VERSION = "nexus3"
-        NEXUS_PROTOCOL = "http"
+        NEXUS_PROTOCOL = "HTTP"
+        CLUSTER_URL = 'https://B0D9665F50FC1CF0D67B6D0FE343D0B0.gr7.us-east-1.eks.amazonaws.com'
         NEXUS_URL = "a9e10564de20542479ec77dc20e4b01d-596046380.us-east-1.elb.amazonaws.com:8081"
         NEXUS_REPOSITORY = "nexus-rep0"
         NEXUS_CREDENTIAL_ID = 'nexus-secret'
@@ -253,7 +254,7 @@ stage('AWS Cli SetUp for image signing') {
       steps {
         container('kubectl') {
           withKubeConfig([credentialsId: "${KUBERNETES_CREDENTIALS}" ,
-                    serverUrl: 'https://B0D9665F50FC1CF0D67B6D0FE343D0B0.gr7.us-east-1.eks.amazonaws.com',
+                    serverUrl: "${CLUSTER_URL}" ,
                     ]) {
                  sh '''
                  kubectl create secret docker-registry regcred || true \
