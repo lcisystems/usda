@@ -144,10 +144,6 @@ pipeline {
           steps {
           container('dind') {
             script {
-              sh '''
-              ls -la
-             '''
-  
               dockerImage = docker.build REPOSITORY_URI + ":${BUILD_NUMBER}.0.0"
                   
         }
