@@ -202,12 +202,12 @@ stage('AWS Cli SetUp for image signing') {
                               --username AWS \
                               --password-stdin "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com"
                             echo "get image digest"
-                            image_digest=$(aws ecr list-images --repository-name ${} --query imageIds[0].imageDigest --output text)
+                            image_digest=$(aws ecr list-images --repository-name "${IMAGE_REPO_NAME}" --query imageIds[0].imageDigest --output text)
 
                             echo "sign image"
-                            notation sign ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}@$image_digest --plugin com.amazonaws.signer.notation.plugin --id arn:aws:signer:us-east-1:665693299603:/signing-profiles/usda_poc
+                            notation sign ${REPOSITORY_URI}@$image_digest --plugin com.amazonaws.signer.notation.plugin --id arn:aws:signer:us-east-1:665693299603:/signing-profiles/usda_poc
                             echo "verifying signature.............."
-                            notation inspect ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}@$image_digest
+                            notation inspect ${REPOSITORY_URI}@$image_digest
                             echo "importing trustpolicy..............."
                             touch /root/.config/notation/trustpolicy.json
                             mv trustpolicy.json /root/.config/notation/trustpolicy.json
