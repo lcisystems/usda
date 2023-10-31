@@ -51,6 +51,7 @@ pipeline {
         // Dockerhub credentials to push and pull images. 
         DOCKERHUB_CREDENTIALS = credentials('dockerhub')
         KUBERNETES_CREDENTIALS  = 'eks'
+        SONAR_QUBE_CREDENTIALS_ID = 'sonarqube'
         NEXUS_VERSION = "nexus3"
         NEXUS_PROTOCOL = "http"
         NEXUS_URL = "a9e10564de20542479ec77dc20e4b01d-596046380.us-east-1.elb.amazonaws.com:8081"
@@ -63,25 +64,11 @@ pipeline {
         REPOSITORY_URI = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}"
         v="${BUILD_NUMBER}"
     }
-  stages {
-    stage('Fetch and Add AWS Secrets to Jenkins') {
-            steps {
-                script {
-                    // Use the AWS Secret Manager Credential Provider to fetch the credentials
-                    withCredentials([[$class: 'AWSSecretManager', credentialsId: aws_credential, secretId: 'nexus-secret-un']]) {
-                        // The 'username' and 'password' variables are now available
-                        echo "Username: ${username}"
-                        echo "Password: ${password}"
-                    }
-                }
-            }
-        }
-    
-        
+  stages {    
     stage('Code-Review') {
       steps {
         container('maven') {
-          withSonarQubeEnv(installationName: 'Sonar', credentialsId: 'sonarqube') {
+          withSonarQubeEnv(installationName: 'Sonar', credentialsId: SONAR_QUBE_CREDENTIALS_ID) {
                 sh 'java -version'
                 sh 'mvn -B -DskipTests clean package -Dv=${BUILD_NUMBER} sonar:sonar'
           }
