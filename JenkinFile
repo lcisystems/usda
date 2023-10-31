@@ -68,7 +68,7 @@ pipeline {
             steps {
                 script {
                     // Use the AWS Secret Manager Credential Provider to fetch the credentials
-                    withCredentials([[$class: 'AWSSEcretsManagerCredentialsBinding', credentialsId: aws_credential, secretId: 'nexus']]) {
+                    withCredentials([[$class: 'AWSSEcretsManagerCredentialsBinding', credentialsId: aws_credential, secretId: 'nexus-secret-un']]) {
                         // The 'username' and 'password' variables are now available
                         echo "Username: ${username}"
                         echo "Password: ${password}"
