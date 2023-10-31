@@ -53,6 +53,8 @@ pipeline {
         DOCKERHUB_CREDENTIALS = credentials('dockerhub')
 
         ARTIFACTORY = credentials('nexus-secret-un')
+        MY_ARTIFACTORY_USERNAME = sh(script: "echo $ARTIFACTORY | cut -d':' -f1", returnStatus: true).trim()
+        MY_ARTIFACTORY_PASSWORD = sh(script: "echo $ARTIFACTORY | cut -d':' -f2", returnStatus: true).trim()
 
         CLUSTER_URL = 'https://B0D9665F50FC1CF0D67B6D0FE343D0B0.gr7.us-east-1.eks.amazonaws.com'
         KUBERNETES_CREDENTIALS  = 'eks'
@@ -99,8 +101,8 @@ pipeline {
             steps {
             container('maven') {
                     script {
-                    print(ARTIFACTORY)
-                    print(ARTIFACTORY_USR)
+                    echo "Artifactory Username: $MY_ARTIFACTORY_USERNAME"
+                    echo "Artifactory Password: $MY_ARTIFACTORY_PASSWORD"
                     def pom = readMavenPom(file: 'pom.xml');
                     filesByGlob = findFiles(glob: "target/*.${pom.packaging}");
                     echo "${filesByGlob[0].name} ${filesByGlob[0].path} ${filesByGlob[0].directory} ${filesByGlob[0].length} ${filesByGlob[0].lastModified}"
