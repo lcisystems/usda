@@ -95,8 +95,10 @@ pipeline {
       steps {
         script {
              withCredentials([usernamePassword(credentialsId: 'nexus-creds', usernameVariable: 'ARTIFACTORY_USR', passwordVariable: 'ARTIFACTORY_PSW')]) {
-              echo "Username: $ARTIFACTORY_USR"
-              echo "Password: $ARTIFACTORY_PSW"
+              def username = ARTIFACTORY_USR
+              def password = ARTIFACTORY_PSW
+              print(username)
+              print(password)
               } 
           }
         }
