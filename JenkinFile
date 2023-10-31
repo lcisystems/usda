@@ -45,6 +45,7 @@ pipeline {
         region = "us-east-1"  
         //artifact upload bucket region. (optional)                    
         region1 = "us-east-2" 
+        AWS_SECRET_ID = 'your-secret-id' // Replace with the actual Secret ID
         //aws credentials                    
         aws_credential = "s3-profile" //aws credentials 
         // Dockerhub credentials to push and pull images. 
@@ -63,7 +64,27 @@ pipeline {
         v="${BUILD_NUMBER}"
     }
   stages {
-  
+    stage('Fetch and Add AWS Secrets to Jenkins') {
+            steps {
+                script {
+                    // Use the AWS Secret Manager Credential Provider to fetch the credentials
+                    withCredentials([[$class: 'AWSSEcretsManagerCredentialsBinding', credentialsId: aws_credential, secretId: 'nexus']]) {
+                        // The 'username' and 'password' variables are now available
+                        echo "Username: ${username}"
+                        echo "Password: ${password}"
+                    }
+
+                        // Add the credentials to Jenkins system credentials
+                        withCredentials([usernamePassword(credentialsId: 'my-secret-credentials', usernameVariable: ', passwordVariable: 'password', description: 'AWS Secret Credentials')]) {
+                            // Your pipeline steps using the credentials go here
+                        }
+                    } else {
+                        error "Failed to fetch AWS Secrets from Secrets Manager"
+                    }
+                }
+            }
+        }
+    }
         
     stage('Code-Review') {
       steps {
