@@ -92,7 +92,7 @@ pipeline {
  stage('Create Nexus Credentials') {
       steps {
         script {
-            withCredentials([usernamePassword(credentialsId: 'nexus-creds', usernameVariable: 'NEXUS_CREDENTIAL_ID_USR', passwordVariable: 'NEXUS_CREDENTIAL_ID_PSW')]) {
+            withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'NEXUS_CREDENTIAL_ID_USR', passwordVariable: 'NEXUS_CREDENTIAL_ID_PSW')]) {
                 def username = env.NEXUS_CREDENTIAL_ID_USR
                 def password = env.NEXUS_CREDENTIAL_ID_PSW
                 print(username)
