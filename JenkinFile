@@ -1,3 +1,4 @@
+
 pipeline {
   agent {
     kubernetes {
@@ -74,6 +75,24 @@ pipeline {
         REPOSITORY_URI = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}"
         v="${BUILD_NUMBER}"
     }
+
+  @NonCPS
+def getNexusCredentials() {
+    def jenkinsCredentials = com.cloudbees.plugins.credentials.CredentialsProvider.lookupCredentials(
+        com.cloudbees.plugins.credentials.Credentials.class,
+        Jenkins.getInstance(),
+        null,
+        null
+    )
+    
+    for (creds in jenkinsCredentials) {
+        if (creds.id == "nexus-secret-un") {
+            println(creds.username)
+            println(creds.password)
+        }
+    }
+}
+
   stages {    
     stage('Code-Review') {
       steps {
@@ -89,20 +108,7 @@ pipeline {
  stage('Create Nexus Credentials') {
       steps {
         script {
-             def jenkinsCredentials = com.cloudbees.plugins.credentials.CredentialsProvider.lookupCredentials(
-              com.cloudbees.plugins.credentials.Credentials.class,
-              Jenkins.instance,
-              null,
-              null
-          );
-          for (creds in jenkinsCredentials) {
-            if(creds.id == "nexus-secret-un"){
-              println(creds.username)
-              println(creds.password)
-              }
-          }
-  
-          }
+          getNexusCredentials()
         }
       }
     
