@@ -117,7 +117,7 @@ pipeline {
                             groupId: pom.groupId,
                             version: "${BUILD_NUMBER}.0.0",
                             repository: NEXUS_REPOSITORY,
-                            credentialsId: NEXUS_CREDENTIAL_ID ,
+                            credentialsId: ARTIFACTORY,
                             artifacts: [
                                 [artifactId: pom.artifactId,
                                 classifier: '',
