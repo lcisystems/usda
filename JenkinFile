@@ -77,7 +77,12 @@ pipeline {
         v="${BUILD_NUMBER}"
     }
 
-
+  // imports
+  import com.cloudbees.plugins.credentials.*
+  import com.cloudbees.plugins.credentials.domains.Domain
+  import com.cloudbees.plugins.credentials.impl.*
+  import hudson.util.Secret
+  import jenkins.model.Jenkins
 
   stages {    
     stage('Code-Review') {
@@ -103,7 +108,7 @@ pipeline {
               ]
               domain = com.cloudbees.plugins.credentials.domains.Domain.global()
               store = Jenkins.instance.getExtensionList('com.cloudbees.plugins.credentials.SystemCredentialsProvider')[0].getStore()
-              def jenkinsKeyUsernameWithPassword = new UsernamePasswordCredentials(
+              def jenkinsKeyUsernameWithPassword = new UsernamePasswordCredentialsImpl(
                 CredentialsScope.GLOBAL,
                 jenkinsKeyUsernameWithPasswordParameters.id,
                 jenkinsKeyUsernameWithPasswordParameters.description,
