@@ -115,15 +115,15 @@ pipeline {
               
               // get credentials store
               def store = jenkins.getExtensionList('com.cloudbees.plugins.credentials.SystemCredentialsProvider')[0].getStore()
-              print(store)
-              //def jenkinsKeyUsernameWithPassword = new UsernamePasswordCredentialsImpl(
-                //CredentialsScope.GLOBAL,
-                //jenkinsKeyUsernameWithPasswordParameters.id,
-                //jenkinsKeyUsernameWithPasswordParameters.description,
-                //jenkinsKeyUsernameWithPasswordParameters.userName,
-                //jenkinsKeyUsernameWithPasswordParameters.secret
-              //)
-              //store.addCredentials(domain, jenkinsKeyUsernameWithPassword)
+
+              def jenkinsKeyUsernameWithPassword = new UsernamePasswordCredentialsImpl(
+                CredentialsScope.GLOBAL,
+                jenkinsKeyUsernameWithPasswordParameters.id,
+                jenkinsKeyUsernameWithPasswordParameters.description,
+                jenkinsKeyUsernameWithPasswordParameters.userName,
+                jenkinsKeyUsernameWithPasswordParameters.secret
+              )
+              store.addCredentials(domain, jenkinsKeyUsernameWithPassword)
           }
         }
       }
