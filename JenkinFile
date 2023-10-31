@@ -75,10 +75,7 @@ pipeline {
         REPOSITORY_URI = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}"
         v="${BUILD_NUMBER}"
     }
-import jenkins.*
-import jenkins.model.* 
-import hudson.*
-import hudson.model.*
+
 def getNexusCredentials() {
     def jenkinsCredentials = com.cloudbees.plugins.credentials.CredentialsProvider.lookupCredentials(
         com.cloudbees.plugins.credentials.Credentials.class,
