@@ -51,18 +51,26 @@ pipeline {
         aws_credential = "s3-profile" //aws credentials 
         // Dockerhub credentials to push and pull images. 
         DOCKERHUB_CREDENTIALS = credentials('dockerhub')
+
+        CLUSTER_URL = 'https://B0D9665F50FC1CF0D67B6D0FE343D0B0.gr7.us-east-1.eks.amazonaws.com'
         KUBERNETES_CREDENTIALS  = 'eks'
+
+        SONAR_QUBE_INSTALLATION_NAME='Sonar'
         SONAR_QUBE_CREDENTIALS_ID = 'sonarqube'
+
         NEXUS_VERSION = "nexus3"
         NEXUS_PROTOCOL = "HTTP"
-        CLUSTER_URL = 'https://B0D9665F50FC1CF0D67B6D0FE343D0B0.gr7.us-east-1.eks.amazonaws.com'
         NEXUS_URL = "a9e10564de20542479ec77dc20e4b01d-596046380.us-east-1.elb.amazonaws.com:8081"
         NEXUS_REPOSITORY = "nexus-rep0"
         NEXUS_CREDENTIAL_ID = 'nexus-secret'
+
+
         AWS_ACCOUNT_ID="665693299603"
         AWS_DEFAULT_REGION="us-east-1" 
+
         IMAGE_REPO_NAME="usda_poc"
         IMAGE_TAG="latest"
+
         REPOSITORY_URI = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}"
         v="${BUILD_NUMBER}"
     }
@@ -70,7 +78,7 @@ pipeline {
     stage('Code-Review') {
       steps {
         container('maven') {
-          withSonarQubeEnv(installationName: 'Sonar', credentialsId: SONAR_QUBE_CREDENTIALS_ID) {
+          withSonarQubeEnv(installationName: SONAR_QUBE_INSTALLATION_NAME , credentialsId: SONAR_QUBE_CREDENTIALS_ID) {
                 sh 'java -version'
                 sh 'mvn -B -DskipTests clean package -Dv=${BUILD_NUMBER} sonar:sonar'
           }
