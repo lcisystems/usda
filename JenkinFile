@@ -52,7 +52,7 @@ pipeline {
         // Dockerhub credentials to push and pull images. 
         DOCKERHUB_CREDENTIALS = credentials('dockerhub')
 
-        ARTIFACTORY = credentials('nexus')
+        ARTIFACTORY = credentials('nexus-creds')
 
         CLUSTER_URL = 'https://B0D9665F50FC1CF0D67B6D0FE343D0B0.gr7.us-east-1.eks.amazonaws.com'
         KUBERNETES_CREDENTIALS  = 'eks'
