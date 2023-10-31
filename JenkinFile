@@ -111,6 +111,7 @@ def getNexusCredentials() {
           getNexusCredentials()
         }
       }
+    }
     
     
   stage("Publish to Nexus Repository Manager") {
