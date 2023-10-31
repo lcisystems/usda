@@ -102,8 +102,8 @@ pipeline {
                     def credentials = ARTIFACTORY.split(':')
                     def username = credentials[0]
                     def password = credentials[1]
-                    print(username)
-                    print(password)
+                    echo "Username: $username"
+                    echo "Password: $password"
                     def pom = readMavenPom(file: 'pom.xml');
                     filesByGlob = findFiles(glob: "target/*.${pom.packaging}");
                     echo "${filesByGlob[0].name} ${filesByGlob[0].path} ${filesByGlob[0].directory} ${filesByGlob[0].length} ${filesByGlob[0].lastModified}"
