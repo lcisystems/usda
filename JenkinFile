@@ -1,19 +1,3 @@
-@NonCPS
-def getNexusCredentials() {
-    def jenkinsCredentials = com.cloudbees.plugins.credentials.CredentialsProvider.lookupCredentials(
-        com.cloudbees.plugins.credentials.Credentials.class,
-        Jenkins.getInstance(),
-        null,
-        null
-    )
-    
-    for (creds in jenkinsCredentials) {
-        if (creds.id == "nexus-secret-un") {
-            println(creds.username)
-            println(creds.password)
-        }
-    }
-}
 pipeline {
   agent {
     kubernetes {
@@ -108,10 +92,14 @@ pipeline {
  stage('Create Nexus Credentials') {
       steps {
         script {
-          getNexusCredentials()
+            withCredentials([usernamePassword(credentialsId: 'nexus-creds', usernameVariable: 'NEXUS_CREDENTIAL_ID_USR', passwordVariable: 'NEXUS_CREDENTIAL_ID_PSW')]) {
+                echo "Username: $NEXUS_CREDENTIAL_ID_USR"
+                echo "Password: $NEXUS_CREDENTIAL_ID_PSW"
+            
         }
       }
     }
+   }
     
     
   stage("Publish to Nexus Repository Manager") {
