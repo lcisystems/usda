@@ -70,7 +70,7 @@ pipeline {
 
         IMAGE_REPO_NAME = 'usda_poc'
         IMAGE_TAG='latest'
-        AWS_SIGNER_PROFILE_NAME = 'usda-poc'
+        AWS_SIGNER_PROFILE_NAME = 'usda_poc'
         REPOSITORY_URI = '${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}'
         v="${BUILD_NUMBER}"
     }
