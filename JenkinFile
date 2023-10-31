@@ -73,18 +73,10 @@ pipeline {
                         echo "Username: ${username}"
                         echo "Password: ${password}"
                     }
-
-                        // Add the credentials to Jenkins system credentials
-                        withCredentials([usernamePassword(credentialsId: 'my-secret-credentials', usernameVariable: ', passwordVariable: 'password', description: 'AWS Secret Credentials')]) {
-                            // Your pipeline steps using the credentials go here
-                        
-                    } else {
-                        error "Failed to fetch AWS Secrets from Secrets Manager"
-                    }
                 }
             }
         }
-    }
+    
         
     stage('Code-Review') {
       steps {
