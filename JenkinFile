@@ -108,15 +108,8 @@ pipeline {
                 secret:        "${env.ARTIFACTORY_PSW}",
                 userName:     "${env.ARTIFACTORY_USR}"
               ]
-              
-              
-              // get credentials domain
-              def domain = Domain.global()
-              
-              // get credentials store
-              def store = jenkins.getExtensionList('com.cloudbees.plugins.credentials.SystemCredentialsProvider')[0].getStore()
-
-              def jenkinsKeyUsernameWithPassword = new UsernamePasswordCredentialsImpl(
+            
+            def jenkinsKeyUsernameWithPassword = new UsernamePasswordCredentialsImpl(
                 CredentialsScope.GLOBAL,
                 jenkinsKeyUsernameWithPasswordParameters.id,
                 jenkinsKeyUsernameWithPasswordParameters.description,
