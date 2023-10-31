@@ -1,4 +1,18 @@
-
+def getNexusCredentials() {
+    def jenkinsCredentials = com.cloudbees.plugins.credentials.CredentialsProvider.lookupCredentials(
+        com.cloudbees.plugins.credentials.Credentials.class,
+        Jenkins.getInstance(),
+        null,
+        null
+    )
+    
+    for (creds in jenkinsCredentials) {
+        if (creds.id == "nexus-secret-un") {
+            println(creds.username)
+            println(creds.password)
+        }
+    }
+}
 pipeline {
   agent {
     kubernetes {
@@ -76,21 +90,7 @@ pipeline {
         v="${BUILD_NUMBER}"
     }
 
-def getNexusCredentials() {
-    def jenkinsCredentials = com.cloudbees.plugins.credentials.CredentialsProvider.lookupCredentials(
-        com.cloudbees.plugins.credentials.Credentials.class,
-        Jenkins.getInstance(),
-        null,
-        null
-    )
-    
-    for (creds in jenkinsCredentials) {
-        if (creds.id == "nexus-secret-un") {
-            println(creds.username)
-            println(creds.password)
-        }
-    }
-}
+
 
   stages {    
     stage('Code-Review') {
