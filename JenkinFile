@@ -94,17 +94,13 @@ pipeline {
  stage('Create Nexus Credentials') {
       steps {
         script {
-             def usernameAndPassword = ARTIFACTORY.split(':')
-                    def username = usernameAndPassword[0]
-                    def password = usernameAndPassword[1]
-            // Print the username and password
-            echo "Username: $username"
-            echo "Password: $password"
-            
-        
-      }
-    }
-   }
+             withCredentials([usernamePassword(credentialsId: 'nexus-creds', usernameVariable: 'ARTIFACTORY_USR', passwordVariable: 'ARTIFACTORY_PSW')]) {
+              echo "Username: $ARTIFACTORY_USR"
+              echo "Password: $ARTIFACTORY_PSW"
+              } 
+          }
+        }
+     }  
     
     
   stage("Publish to Nexus Repository Manager") {
