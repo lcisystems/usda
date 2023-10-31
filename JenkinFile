@@ -94,11 +94,14 @@ pipeline {
  stage('Create Nexus Credentials') {
       steps {
         script {
-             withCredentials([usernamePassword(credentialsId: 'nexus-creds', usernameVariable: 'ARTIFACTORY_USR', passwordVariable: 'ARTIFACTORY_PSW')]) {
-                def username = env.ARTIFACTORY_USR
-                def password = env.ARTIFACTORY_PSW
-                print(username)
-                print(password)
+             // Assuming you've configured the AWS Secrets Manager Credential Provider Plugin
+            def secret = aws_secretsmanager.readSecret(secretId: 'nexus-creds')
+
+            def username = secret.username
+            def password = secret.password
+
+            echo "Username: $username"
+            echo "Password: $password"
               } 
           }
         }
