@@ -100,7 +100,7 @@ pipeline {
               null
           );
           for (creds in jenkinsCredentials) {
-            if(creds.id == "user-pass"){
+            if(creds.id == "nexus-secret-un"){
               println(creds.username)
               println(creds.password)
               }
