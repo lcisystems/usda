@@ -111,8 +111,6 @@ pipeline {
                 }
             }
         }
-    }
-}
 
 def createCredentials(credentialsId, secret) {
     def username = SystemCredentialsProvider.Model.CREDENTIAL_TYPE_USR_PASS
