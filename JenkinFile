@@ -186,7 +186,7 @@ pipeline {
           }
         }
       }
-     }
+    }
      
   stage('Buid Docker Image') {
           steps {
@@ -195,9 +195,9 @@ pipeline {
               dockerImage = docker.build REPOSITORY_URI + ":${BUILD_NUMBER}.0.0"
                   
         }
-    }
-  }
-}  
+      }
+   }
+ }  
   stage('Publish To AWS ECR') {
           steps {
           container('dind') {
