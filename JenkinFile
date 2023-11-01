@@ -152,7 +152,7 @@ pipeline {
                             groupId: pom.groupId,
                             version: "${BUILD_NUMBER}.0.0",
                             repository: NEXUS_REPOSITORY,
-                            credentialsId: ARTIFACTORY,
+                            credentialsId: 'nexus-secret-un',
                             artifacts: [
                                 [artifactId: pom.artifactId,
                                 classifier: '',
