@@ -7,7 +7,7 @@
 
 @NonCPS
 def createCredentials(credentialsId, username, password) {
-    def credentials = com.cloudbees.jenkins.plugins.sshcredentials.impl.BasicSSHUserPrivateKey.DESCRIPTOR.getDescriptorList().get(0).getCredentials()
+    def credentials = com.cloudbees.plugins.credentials.SystemCredentialsProvider')[0]
     def secret = new com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl(
         CredentialsScope.GLOBAL,
         credentialsId,
