@@ -177,26 +177,15 @@ pipeline {
     steps {
         script {
             def credentialsId = 'nexus-temp-cred'
-
-            def domain = com.cloudbees.plugins.credentials.domains.Domain.global()
-            def store = Jenkins.instance.getExtensionList("com.cloudbees.plugins.credentials.SystemCredentialsProvider")[0].getStore()
-
-            // Find the credentials to delete
-            def credentialsToRemove = store.allCredentials.findAll {
-                it.id == credentialsId
-            }
-
-            if (credentialsToRemove) {
-                for (credential in credentialsToRemove) {
-                    store.removeCredentials(domain, credential)
-                    println "Deleted credentials with ID: ${credential.id}"
-                }
-            } else {
-                println "Credentials with ID ${credentialsId} not found."
-            }
+            
+            // Delete the specified credentials by their ID
+            credentials([[$class: 'DeleteCredentialsBinding', credentialsId: credentialsId]])
+            
+            println "Deleted credentials with ID: ${credentialsId}"
         }
     }
 }
+
 
   stage('Retrive Artifact from Nexus') {
           steps {
