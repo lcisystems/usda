@@ -16,8 +16,7 @@ def createCredentials(credentialsId, username, password) {
         username,
         password
     )
-    store.add(secret)
-    store.save()
+    store.addCredentials(domain, secret)
 }
 
 
