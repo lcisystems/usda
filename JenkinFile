@@ -113,22 +113,7 @@ pipeline {
             store.addCredentials(domain, usernameAndPassword)
         }
     }
-}
-
-
-
-//def credentials(username, password) {
-    //return [(($class: 'StringBinding') with {
-        //credentialsId = ''
-        //secret = username
-    //}), (($class: 'StringBinding') with {
-        //credentialsId = ''
-       // secret = password
-    //})]
-//}
-
-     
-    
+}    
     
   stage("Publish to Nexus Repository Manager") {
             steps {
