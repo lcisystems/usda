@@ -12,15 +12,7 @@ def createCredentials(credentialsId, secret) {
     return Jenkins.instance.createCredentials(domain, username, description, secret)
 }
 
-def credentials(username, password) {
-    return [(($class: 'StringBinding') with {
-        credentialsId = 'nexus-secret-un'
-        secret = username
-    }), (($class: 'StringBinding') with {
-        credentialsId = 'nexus-secret-un'
-        secret = password
-    })]
-}
+def credentials(username: String, password: String) { return [(($class: 'StringBinding') with { credentialsId = '' secret = username }), (($class: 'StringBinding') with { credentialsId = '' secret = password })] } 
 
 pipeline {
   agent {
