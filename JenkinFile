@@ -99,27 +99,39 @@ pipeline {
     }
 
 
-   stage('Create Nexus Credentials') {
-          steps {
-            script {
-              def jenkinsKeyUsernameWithPasswordParameters = [
-                description:  'nexus secret',
-                id:           'nexus-secret-value',
-                secret:        "${env.ARTIFACTORY_PSW}",
-                userName:     "${env.ARTIFACTORY_USR}"
-              ]
-            
-            def jenkinsKeyUsernameWithPassword = new UsernamePasswordCredentialsImpl(
-                CredentialsScope.GLOBAL,
-                jenkinsKeyUsernameWithPasswordParameters.id,
-                jenkinsKeyUsernameWithPasswordParameters.description,
-                jenkinsKeyUsernameWithPasswordParameters.userName,
-                jenkinsKeyUsernameWithPasswordParameters.secret
-              )
-              store.addCredentials(domain, jenkinsKeyUsernameWithPassword)
-          }
+   stage('Add Credentials') {
+            steps {
+                script {
+                    def credentialsId = 'nexus-secret-un'
+                    def username = "${env.ARTIFACTORY_USR}"
+                    def password = "${env.ARTIFACTORY_PSW}"
+                    
+                    def secret = credentials(username, password)
+                    def credentials = createCredentials(credentialsId, secret)
+                }
+            }
         }
-      }
+    }
+}
+
+def createCredentials(credentialsId, secret) {
+    def username = SystemCredentialsProvider.Model.CREDENTIAL_TYPE_USR_PASS
+    def domain = Domain.global()
+    def description = "My new credentials"
+
+    return Jenkins.instance.createCredentials(domain, username, description, secret)
+}
+
+def credentials(username, password) {
+    return [(($class: 'StringBinding') with {
+        credentialsId = ''
+        secret = username
+    }), (($class: 'StringBinding') with {
+        credentialsId = ''
+        secret = password
+    })]
+}
+
      
     
     
