@@ -4,15 +4,10 @@
   import com.cloudbees.plugins.credentials.impl.*
   import hudson.util.Secret
   import jenkins.model.Jenkins
-def createCredentials(credentialsId, secret) {
-    def username = SystemCredentialsProvider.Model.CREDENTIAL_TYPE_USR_PASS
-    def domain = Domain.global()
-    def description = "My new credentials"
+@NonCPS 
+def createCredentials(credentialsId, username, password) { def credentials = Jenkins.instance.getExtensionList('com.cloudbees.plugins.credentials.CredentialsStore')[0] def domain = Domain.global() def secret = new StringCredentialsImpl(CredentialsScope.GLOBAL, credentialsId, 'Username and Password', SecretBytes.fromString("${username}:${password}")) credentials.addCredentials(domain, secret) credentials.save() }
 
-    return Jenkins.instance.createCredentials(domain, username, description, secret)
-}
 
-def credentials(username: String, password: String) { return [(($class: 'StringBinding') with { credentialsId = '' secret = username }), (($class: 'StringBinding') with { credentialsId = '' secret = password })] } 
 
 pipeline {
   agent {
@@ -116,7 +111,7 @@ pipeline {
                     def password = "${env.ARTIFACTORY_PSW}"
                     
                     def secret = credentials(username, password)
-                    def credentials = createCredentials(credentialsId, secret)
+                    def credentials = createCredentials(credentialsId, username, password)
                 }
             }
         }
