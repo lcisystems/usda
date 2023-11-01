@@ -5,13 +5,20 @@
   import hudson.util.Secret
   import jenkins.model.Jenkins
 @NonCPS
+@NonCPS
 def createCredentials(credentialsId, username, password) {
-    def credentials = Jenkins.instance.getExtensionList('com.cloudbees.plugins.credentials.CredentialsStore')[0]
-    def domain = Domain.global()
-    def secret = new StringCredentialsImpl(CredentialsScope.GLOBAL, credentialsId, 'Username and Password', SecretBytes.fromString("${username}:${password}"))
-    credentials.addCredentials(domain, secret)
+    def credentials = com.cloudbees.jenkins.plugins.sshcredentials.impl.BasicSSHUserPrivateKey.DESCRIPTOR.getDescriptorList().get(0).getCredentials()
+    def secret = new com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl(
+        CredentialsScope.GLOBAL,
+        credentialsId,
+        'nexus-secret-un',
+        username,
+        password
+    )
+    credentials.add(secret)
     credentials.save()
 }
+
 
 
 
