@@ -4,7 +4,7 @@
   import com.cloudbees.plugins.credentials.impl.*
   import hudson.util.Secret
   import jenkins.model.Jenkins
-@NonCPS
+
 @NonCPS
 def createCredentials(credentialsId, username, password) {
     def credentials = com.cloudbees.jenkins.plugins.sshcredentials.impl.BasicSSHUserPrivateKey.DESCRIPTOR.getDescriptorList().get(0).getCredentials()
