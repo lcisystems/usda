@@ -157,7 +157,6 @@ pipeline {
         }
      }
 
-  
    stage('Delete Credentials') {
     steps {
         script {
@@ -171,8 +170,7 @@ pipeline {
     }
 }
 
-
-  stage('Retrive Artifact from Nexus') {
+ stage('Retrive Artifact from Nexus') {
           steps {
           container('dind') {
             script {
@@ -186,8 +184,8 @@ pipeline {
           }
         }
       }
-    }
-     
+    }  
+
   stage('Buid Docker Image') {
           steps {
           container('dind') {
@@ -198,7 +196,8 @@ pipeline {
       }
    }
  }  
-  stage('Publish To AWS ECR') {
+
+stage('Publish To AWS ECR') {
           steps {
           container('dind') {
              script{// This is the script that build and push the Docker image of the application.
@@ -207,12 +206,12 @@ pipeline {
                   dockerImage.push()
      
                }           
+             }        
            }
-                  
         }
-    }
-  }
-stage('AWS Cli SetUp for image signing') {
+     } 
+
+  stage('AWS Cli SetUp for image signing') {
       steps {
         container('notationcli') {
           script {
