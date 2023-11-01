@@ -7,7 +7,9 @@
 
 @NonCPS
 def createCredentials(credentialsId, username, password) {
-    def credentials = com.cloudbees.plugins.credentials.SystemCredentialsProvider')[0]
+    instance = Jenkins.instance
+    domain = Domain.global()
+    store = instance.getExtensionList("com.cloudbees.plugins.credentials.SystemCredentialsProvider")[0].getStore()
     def secret = new com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl(
         CredentialsScope.GLOBAL,
         credentialsId,
@@ -15,8 +17,8 @@ def createCredentials(credentialsId, username, password) {
         username,
         password
     )
-    credentials.add(secret)
-    credentials.save()
+    store.add(secret)
+    store.save()
 }
 
 
