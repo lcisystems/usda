@@ -99,17 +99,12 @@ pipeline {
             def username = "${env.ARTIFACTORY_USR}"
             def password = "${env.ARTIFACTORY_PSW}"
 
-            import jenkins.model.Jenkins
-            import com.cloudbees.plugins.credentials.CredentialsScope
-            import com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl
-            import com.cloudbees.plugins.credentials.domains.Domain
-
             def instance = Jenkins.instance
-            def domain = Domain.global()
+            def domain = com.cloudbees.plugins.credentials.domains.Domain.global()
             def store = instance.getExtensionList("com.cloudbees.plugins.credentials.SystemCredentialsProvider")[0].getStore()
 
-            def usernameAndPassword = new UsernamePasswordCredentialsImpl(
-                CredentialsScope.GLOBAL,
+            def usernameAndPassword = new com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl(
+                com.cloudbees.plugins.credentials.CredentialsScope.GLOBAL,
                 credentialsId, // Use the provided credentialsId
                 "Secret Description", // Provide a description
                 username, // Use the username variable
@@ -120,6 +115,7 @@ pipeline {
         }
     }
 }
+
 
 
 //def credentials(username, password) {
