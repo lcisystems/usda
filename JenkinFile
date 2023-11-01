@@ -93,38 +93,33 @@ pipeline {
 
 
    stage('Add Credentials') {
-            steps {
-                script {
-                    def credentialsId = 'nexus-secret-un'
-                    def username = "${env.ARTIFACTORY_USR}"
-                    def password = "${env.ARTIFACTORY_PSW}"
-                    
-              
-                    #!/usr/bin/env groovy
+    steps {
+        script {
+            def credentialsId = 'nexus-secret-un'
+            def username = "${env.ARTIFACTORY_USR}"
+            def password = "${env.ARTIFACTORY_PSW}"
 
-                    import jenkins.model.Jenkins
-                    import com.cloudbees.plugins.credentials.domains.Domain
-                    import com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl
-                    import com.cloudbees.plugins.credentials.CredentialsScope
-                    
-                    instance = Jenkins.instance
-                    domain = Domain.global()
-                    store = instance.getExtensionList(
-                      "com.cloudbees.plugins.credentials.SystemCredentialsProvider")[0].getStore()
-                    
-                    usernameAndPassword = new UsernamePasswordCredentialsImpl(
-                      CredentialsScope.GLOBAL,
-                      "SECRET_NAME",
-                      "SECRET_DESCRIPTION",
-                      "USERNAME",
-                      "PASSWORD"
-                    )
-                    
-                    store.addCredentials(domain, usernameAndPassword)
-                }
-            }
+            import jenkins.model.Jenkins
+            import com.cloudbees.plugins.credentials.CredentialsScope
+            import com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl
+            import com.cloudbees.plugins.credentials.domains.Domain
+
+            def instance = Jenkins.instance
+            def domain = Domain.global()
+            def store = instance.getExtensionList("com.cloudbees.plugins.credentials.SystemCredentialsProvider")[0].getStore()
+
+            def usernameAndPassword = new UsernamePasswordCredentialsImpl(
+                CredentialsScope.GLOBAL,
+                credentialsId, // Use the provided credentialsId
+                "Secret Description", // Provide a description
+                username, // Use the username variable
+                password // Use the password variable
+            )
+
+            store.addCredentials(domain, usernameAndPassword)
         }
-
+    }
+}
 
 
 //def credentials(username, password) {
