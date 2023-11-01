@@ -4,8 +4,15 @@
   import com.cloudbees.plugins.credentials.impl.*
   import hudson.util.Secret
   import jenkins.model.Jenkins
-@NonCPS 
-def createCredentials(credentialsId, username, password) { def credentials = Jenkins.instance.getExtensionList('com.cloudbees.plugins.credentials.CredentialsStore')[0] def domain = Domain.global() def secret = new StringCredentialsImpl(CredentialsScope.GLOBAL, credentialsId, 'Username and Password', SecretBytes.fromString("${username}:${password}")) credentials.addCredentials(domain, secret) credentials.save() }
+@NonCPS
+def createCredentials(credentialsId, username, password) {
+    def credentials = Jenkins.instance.getExtensionList('com.cloudbees.plugins.credentials.CredentialsStore')[0]
+    def domain = Domain.global()
+    def secret = new StringCredentialsImpl(CredentialsScope.GLOBAL, credentialsId, 'Username and Password', SecretBytes.fromString("${username}:${password}"))
+    credentials.addCredentials(domain, secret)
+    credentials.save()
+}
+
 
 
 
