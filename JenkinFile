@@ -4,7 +4,13 @@
   import com.cloudbees.plugins.credentials.impl.*
   import hudson.util.Secret
   import jenkins.model.Jenkins
+def createCredentials(credentialsId, secret) {
+    def username = SystemCredentialsProvider.Model.CREDENTIAL_TYPE_USR_PASS
+    def domain = Domain.global()
+    def description = "My new credentials"
 
+    return Jenkins.instance.createCredentials(domain, username, description, secret)
+}
 pipeline {
   agent {
     kubernetes {
@@ -112,13 +118,7 @@ pipeline {
             }
         }
 
-def createCredentials(credentialsId, secret) {
-    def username = SystemCredentialsProvider.Model.CREDENTIAL_TYPE_USR_PASS
-    def domain = Domain.global()
-    def description = "My new credentials"
 
-    return Jenkins.instance.createCredentials(domain, username, description, secret)
-}
 
 //def credentials(username, password) {
     //return [(($class: 'StringBinding') with {
