@@ -95,7 +95,7 @@ pipeline {
    stage('Add Credentials') {
     steps {
         script {
-            def credentialsId = 'nexus-secret-un'
+            def credentialsId = 'nexus-temp-cred'
             def username = "${env.ARTIFACTORY_USR}"
             def password = "${env.ARTIFACTORY_PSW}"
 
@@ -152,7 +152,7 @@ pipeline {
                             groupId: pom.groupId,
                             version: "${BUILD_NUMBER}.0.0",
                             repository: NEXUS_REPOSITORY,
-                            credentialsId: 'nexus-secret-un',
+                            credentialsId: 'nexus-temp-cred',
                             artifacts: [
                                 [artifactId: pom.artifactId,
                                 classifier: '',
