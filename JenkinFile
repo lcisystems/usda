@@ -112,7 +112,7 @@ pipeline {
                     def username = "${env.ARTIFACTORY_USR}"
                     def password = "${env.ARTIFACTORY_PSW}"
                     
-                    def secret = credentials(username: username, password: password)
+                    def secret = credentials(username, password)
                     def credentials = createCredentials(credentialsId, secret)
                 }
             }
