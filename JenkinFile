@@ -376,7 +376,7 @@ pipeline {
         //aws credentials                    
         aws_credential = "s3-profile" //aws credentials 
         // Dockerhub credentials to push and pull images. 
-        DOCKERHUB_CREDENTIALS = credentials('dockerhub')
+        //DOCKERHUB_CREDENTIALS = credentials('dockerhub')
 
         ARTIFACTORY = credentials('myartifactory')
 
