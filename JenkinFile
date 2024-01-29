@@ -554,7 +554,7 @@ stage('deploy') {
       def ftpProfile = getFtpPublishProfile pubProfilesJson
       // upload package
       sh "apk add curl"
-      sh "curl -T target/LoginWebApp-${BUILD_NUMBER}.0.0.war $ftpProfile.url/webapps/ROOT.war -u '$ftpProfile.username:$ftpProfile.password'"
+      sh "curl -T target/LoginWebApp-${BUILD_NUMBER}.0.0.war $ftpProfile.url/webapps/LoginWebApp-${BUILD_NUMBER}.0.0.war -u '$ftpProfile.username:$ftpProfile.password'"
       // log out
       sh 'az logout'
         }
