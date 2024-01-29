@@ -515,6 +515,7 @@ pipeline {
     }  
 stage('install Azure CLI'){
         steps{
+        container('dind') {
          script {
             sh '''
             apk add py3-pip
@@ -522,6 +523,7 @@ stage('install Azure CLI'){
             pip install --upgrade pip
             pip install azure-cli
             '''
+            }
         }
     }
 }
