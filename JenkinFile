@@ -553,6 +553,7 @@ stage('deploy') {
       def pubProfilesJson = sh script: "az webapp deployment list-publishing-profiles -g $resourceGroup -n $webAppName", returnStdout: true
       def ftpProfile = getFtpPublishProfile pubProfilesJson
       // upload package
+      sh "apk add curl"
       sh "curl -T target/LoginWebApp-${BUILD_NUMBER}.0.0.war $ftpProfile.url/webapps/ROOT.war -u '$ftpProfile.username:$ftpProfile.password'"
       // log out
       sh 'az logout'
