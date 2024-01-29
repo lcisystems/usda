@@ -514,6 +514,7 @@ pipeline {
       }
     }  
 stage('deploy') {
+    steps {
       def resourceGroup = 'faamcpipeline-dev-westus-001'
       def webAppName = 'faamtestdeployment'
       // login Azure
@@ -531,7 +532,7 @@ stage('deploy') {
       // log out
       sh 'az logout'
     }
-  
+  }
 //   stage('Buid Docker Image') {
 //           steps {
 //           container('dind') {
