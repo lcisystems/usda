@@ -520,7 +520,6 @@ stage('install Azure CLI'){
             sh '''
             apk add py3-pip
             apk add gcc musl-dev python3-dev libffi-dev openssl-dev cargo make
-            pip install --upgrade pip
             pip install azure-cli
             '''
             }
