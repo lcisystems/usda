@@ -360,6 +360,11 @@ pipeline {
               command:
                 - cat
               tty: true
+            - name: azurecli
+              image: mcr.microsoft.com/azure-cli:latest
+              command:
+                - cat
+              tty: true
             - name: dind
               image: docker:dind
               securityContext:
@@ -522,21 +527,10 @@ pipeline {
         }
       }
     }  
-stage('install Azure CLI'){
-        steps{
-        container('dind') {
-         script {
-            sh '''
-            apk add py3-pip
-            apk add gcc musl-dev python3-dev libffi-dev openssl-dev cargo make
-            pip install azure-cli
-            '''
-            }
-        }
-    }
-}
+
 stage('deploy') {
     steps {
+    container (azurecli) {
         script {
       def resourceGroup = 'faamcpipeline-dev-westus-001'
       def webAppName = 'faamtestdeployment'
@@ -554,8 +548,9 @@ stage('deploy') {
       sh "curl -T target/LoginWebApp-${BUILD_NUMBER}.0.0.war $ftpProfile.url/webapps/ROOT.war -u '$ftpProfile.username:$ftpProfile.password'"
       // log out
       sh 'az logout'
-    }
-  }
+        }
+      }
+   }    
 }
 //   stage('Buid Docker Image') {
 //           steps {
