@@ -379,7 +379,7 @@ pipeline {
         //DOCKERHUB_CREDENTIALS = credentials('dockerhub')
 
         //ARTIFACTORY = credentials('myartifactory')
-        AZURE_SUBSCRIPTION_ID='79e9d8d4-c283-47dc-8a70-569982230d31',
+        AZURE_SUBSCRIPTION_ID='79e9d8d4-c283-47dc-8a70-569982230d31'
         AZURE_TENANT_ID='4a06bbff-6d9b-4b0e-8db4-28862802648a'
 
         CLUSTER_URL = 'https://faamc-eprtsyjn.hcp.westus.azmk8s.io:443'
