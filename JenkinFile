@@ -340,6 +340,15 @@ pipeline {
         metadata:
           name: build-server
         spec:
+          affinity:
+            nodeAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                nodeSelectorTerms:
+                - matchExpressions:
+                  - key: faamc
+                    operator: In
+                    values:
+                    - dev
           containers:
             - name: maven
               image: maven:3-openjdk-17
