@@ -530,7 +530,7 @@ pipeline {
 
 stage('deploy') {
     steps {
-    container (azurecli) {
+    container ('azurecli') {
         script {
       def resourceGroup = 'faamcpipeline-dev-westus-001'
       def webAppName = 'faamtestdeployment'
