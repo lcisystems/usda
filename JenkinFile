@@ -378,7 +378,7 @@ pipeline {
         // Dockerhub credentials to push and pull images. 
         //DOCKERHUB_CREDENTIALS = credentials('dockerhub')
 
-        ARTIFACTORY = credentials('myartifactory')
+        //ARTIFACTORY = credentials('myartifactory')
 
         CLUSTER_URL = 'https://faamc-eprtsyjn.hcp.westus.azmk8s.io:443'
         KUBERNETES_CREDENTIALS  = 'eks'
