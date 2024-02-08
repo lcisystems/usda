@@ -1,11 +1,30 @@
-# -- stackhawk configuration for todoapp --
+
+# -- stackhawk configuration for tms --
 app:
   # -- An applicationId obtained from the StackHawk platform. --
-  applicationId: 6c5f92b6-5d20-40f3-8740-5f92dba2f7f3 # (required)
+  applicationId: 2512ebf6-41c4-4c29-8971-7142e5ecc91e # (required)
   # -- The environment for the applicationId defined in the StackHawk platform. --
-  env: Production # (required)
+  env: Development # (required)
   # -- The url of your application to scan --
-  host: https://todo.houessou.com # (required)
+  host: http://tmsec-deval-7dlnjynibyk0-1768616387.us-east-1.elb.amazonaws.com/login # (required)
+  openApiConf: 
+      filePath: "tmsdev.json"
+
+# -- Customized Configuration for GraphQL/SOAP/OpenAPI, add here --
+  # openApiConf:
+  #   path: /swagger.json # OR...
+#       filePath: openApi.json
+  # autoPolicy: true
+  # autoInputVectors: true
+  # Configuration Docs: https://docs.stackhawk.com/hawkscan/configuration/
+
+# -- If Authenticated Scanning is needed, add here --
+  # Authenticated Scanning Docs: https://docs.stackhawk.com/hawkscan/authenticated-scanning.html
+  # Authenticated Scanning Repo: https://github.com/kaakaww/scan-configuration/tree/main/Authentication
+
+# -- Help Section --
+  # Docs: https://docs.stackhawk.com/
+  # Contact Support: support@stackhawk.com
 
 hawk:
   startupTimeoutMinutes: 1
