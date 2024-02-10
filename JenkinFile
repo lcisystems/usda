@@ -29,7 +29,9 @@ pipeline {
       }
       steps {
         sh '''
-         
+         pip install requests
+         pip install jinja2
+
         '''
       }
     }
