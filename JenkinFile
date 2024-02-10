@@ -32,7 +32,7 @@ pipeline {
         sh '''
          pip install requests
          pip install jinja2
-         python3 scan_result.py
+         python3 scan.py
 
         '''
         publishHTML (target : [allowMissing: false,
