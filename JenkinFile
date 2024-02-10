@@ -38,7 +38,7 @@ pipeline {
         publishHTML (target : [allowMissing: false,
         alwaysLinkToLastBuild: true,
         keepAll: false,
-        reportFiles: '',
+        reportFiles: 'scan_result.html',
         reportName: 'My Reports',
         reportTitles: 'The Report'])
       }
