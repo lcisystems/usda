@@ -31,8 +31,15 @@ pipeline {
         sh '''
          pip install requests
          pip install jinja2
+         python3 scan_result.py
 
         '''
+        publishHTML (target : [allowMissing: false,
+        alwaysLinkToLastBuild: true,
+        keepAll: false,
+        reportFiles: '',
+        reportName: 'My Reports',
+        reportTitles: 'The Report'])
       }
     }
   }
