@@ -30,7 +30,7 @@ pipeline {
       }
       steps {
         sh '''
-         rm scan_result.txt
+         rm scan_result.html
          pip install requests
          pip install jinja2
          python3 scan.py
