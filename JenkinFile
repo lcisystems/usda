@@ -23,6 +23,15 @@ pipeline {
             stackhawk/hawkscan
         '''
       }
+     stage ("Get Scan Result") {
+      environment {
+        HAWK_API_KEY = credentials('HAWK_API_KEY')
+      }
+      steps {
+        sh '''
+         
+        '''
+      }
     }
   }
 }
