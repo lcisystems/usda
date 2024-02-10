@@ -41,6 +41,7 @@ pipeline {
         reportName: 'My Reports',
         reportTitles: 'The Report'])
       }
+      }
     }
   }
 }
