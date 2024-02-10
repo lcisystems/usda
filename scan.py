@@ -157,7 +157,7 @@ def create_scan_document(json_data):
     # The HTML output is ready to be saved to an HTML file or displayed as needed
     print(html_output)
 
-    output_file_path = 'scan_result.txt'
+    output_file_path = 'scan_result.html'
 
     with open(output_file_path, 'x') as file:
         # Write the Scans DataFrame
