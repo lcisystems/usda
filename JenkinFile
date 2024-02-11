@@ -31,6 +31,7 @@ pipeline {
       steps {
         sh '''
          rm scan_result.html
+         mkdir reports
          pip install requests
          pip install jinja2
          python3 scan.py
@@ -40,6 +41,7 @@ pipeline {
         publishHTML (target : [allowMissing: false,
         alwaysLinkToLastBuild: true,
         keepAll: false,
+        reportDir: 'reports'
         reportFiles: 'scan_result.html',
         reportName: 'My Reports',
         reportTitles: 'The Report'])
