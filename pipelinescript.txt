@@ -1,0 +1,702 @@
+// pipeline {
+//   agent {
+//     kubernetes {
+//       yaml '''
+//         apiVersion: v1
+//         kind: Pod
+//         metadata:
+//           name: build-server
+//         spec:
+//           containers:
+//             - name: notationcli
+//               image: 665693299603.dkr.ecr.us-east-1.amazonaws.com/notationcli:1.0.0
+//               command:
+//                 - cat
+//               tty: true
+//             - name: maven
+//               image: 665693299603.dkr.ecr.us-east-1.amazonaws.com/maven:1.0.0
+//               command: 
+//                 - cat
+//               tty: true
+//             - name: kubectl
+//               image: 665693299603.dkr.ecr.us-east-1.amazonaws.com/kubectl:1.0.0
+//               command:
+//                 - cat
+//               tty: true
+//             - name: dind
+//               image: 665693299603.dkr.ecr.us-east-1.amazonaws.com/dockerdind:1.0.0
+//               securityContext:
+//                 privileged: true
+//               volumeMounts:
+//                 - name: dind-storage
+//                   mountPath: /var/lib/docker
+//           imagePullSecrets:
+//             - name: regcred
+//           volumes:
+//             - name: efs-volume
+//               persistentVolumeClaim:
+//                 claimName: efs-pvc-agent 
+//             - name: dind-storage
+//               emptyDir: {}
+//         '''    
+//     }
+//   }
+//     environment { 
+//         //artifact deployment bucket region          
+//         region = "us-east-1"  
+//         //artifact upload bucket region. (optional)                    
+//         region1 = "us-east-2" 
+//         AWS_SECRET_ID = 'your-secret-id' // Replace with the actual Secret ID
+//         //aws credentials                    
+//         aws_credential = "s3-profile" //aws credentials 
+//         // Dockerhub credentials to push and pull images. 
+//         DOCKERHUB_CREDENTIALS = credentials('dockerhub')
+
+//         ARTIFACTORY = credentials('myartifactory')
+
+//         CLUSTER_URL = 'https://B0D9665F50FC1CF0D67B6D0FE343D0B0.gr7.us-east-1.eks.amazonaws.com'
+//         KUBERNETES_CREDENTIALS  = 'eks'
+
+//         SONAR_QUBE_INSTALLATION_NAME='Sonar'
+//         SONAR_QUBE_CREDENTIALS_ID = 'sonarqube'
+
+//         NEXUS_VERSION = 'nexus3'
+//         NEXUS_PROTOCOL = 'HTTP'
+//         NEXUS_URL = 'a9e10564de20542479ec77dc20e4b01d-596046380.us-east-1.elb.amazonaws.com:8081'
+//         NEXUS_REPOSITORY = 'nexus-rep0'
+//         NEXUS_CREDENTIAL_ID = 'nexus-secret'
+
+
+//         AWS_ACCOUNT_ID='665693299603'
+//         AWS_DEFAULT_REGION='us-east-1' 
+
+//         IMAGE_REPO_NAME = 'usda_poc'
+//         IMAGE_TAG='latest'
+//         AWS_SIGNER_PROFILE_NAME = 'usda_poc'
+//         REPOSITORY_URI = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}"
+//         v="${BUILD_NUMBER}"
+//     }
+
+
+
+//   stages {    
+//     stage('Code-Review') {
+//       steps {
+//         container('maven') {
+//           withSonarQubeEnv(installationName: SONAR_QUBE_INSTALLATION_NAME , credentialsId: SONAR_QUBE_CREDENTIALS_ID) {
+//                 sh 'java -version'
+//                 sh 'mvn -B -DskipTests clean package -Dv=${BUILD_NUMBER} sonar:sonar'
+//           }
+//         }
+//       }
+//     }
+
+
+//    stage('Add Credentials') {
+//     steps {
+//         script {
+//             def credentialsId = 'nexus-temp-cred'
+//             def username = "${env.ARTIFACTORY_USR}"
+//             def password = "${env.ARTIFACTORY_PSW}"
+
+//             def domain = com.cloudbees.plugins.credentials.domains.Domain.global()
+//             def store = Jenkins.instance.getExtensionList("com.cloudbees.plugins.credentials.SystemCredentialsProvider")[0].getStore()
+
+//             def usernameAndPassword = new com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl(
+//                 com.cloudbees.plugins.credentials.CredentialsScope.GLOBAL,
+//                 credentialsId,
+//                 "Secret Description",
+//                 username,
+//                 password
+//             )
+
+//             store.addCredentials(domain, usernameAndPassword)
+//         }
+//     }
+// }    
+    
+//   stage("Publish to Nexus Repository Manager") {
+//             steps {
+//             container('maven') {
+//                     script {
+//                     sh'''
+//                     echo "Username: $ARTIFACTORY_USR"
+//                     echo "Password: $ARTIFACTORY_PSW"
+//                     '''
+//                     def pom = readMavenPom(file: 'pom.xml');
+//                     filesByGlob = findFiles(glob: "target/*.${pom.packaging}");
+//                     echo "${filesByGlob[0].name} ${filesByGlob[0].path} ${filesByGlob[0].directory} ${filesByGlob[0].length} ${filesByGlob[0].lastModified}"
+//                     artifactPath = filesByGlob[0].path;
+//                     artifactExists = fileExists artifactPath;
+//                     if(artifactExists) {
+//                         echo "*** File: ${artifactPath}, group: ${pom.groupId}, packaging: ${pom.packaging}, version ${pom.version}";
+//                         nexusArtifactUploader(
+//                             nexusVersion: NEXUS_VERSION,
+//                             protocol: NEXUS_PROTOCOL,
+//                             nexusUrl: NEXUS_URL,
+//                             groupId: pom.groupId,
+//                             version: "${BUILD_NUMBER}.0.0",
+//                             repository: NEXUS_REPOSITORY,
+//                             credentialsId: 'nexus-temp-cred',
+//                             artifacts: [
+//                                 [artifactId: pom.artifactId,
+//                                 classifier: '',
+//                                 file: artifactPath,
+//                                 type: pom.packaging],
+//                                 [artifactId: pom.artifactId,
+//                                 classifier: '',
+//                                 file: "pom.xml",
+//                                 type: "pom"]
+//                             ]
+//                         );
+//                     } else {
+//                         error "*** File: ${artifactPath}, could not be found";
+//                     }
+//                 }
+//             }
+//         }
+//      }
+
+//    stage('Delete Credentials') {
+//     steps {
+//         script {
+//             def credentialsId = 'nexus-temp-cred'
+            
+//             // Delete the specified credentials by their ID
+//             credentials([[$class: 'DeleteCredentialsBinding', credentialsId: credentialsId]])
+            
+//             println "Deleted credentials with ID: ${credentialsId}"
+//         }
+//     }
+// }
+
+//  stage('Retrive Artifact from Nexus') {
+//           steps {
+//           container('dind') {
+//             script {
+//             withCredentials([usernamePassword(credentialsId: 'nexus-creds', usernameVariable: 'NEXUS_CREDENTIAL_ID_USR', passwordVariable: 'NEXUS_CREDENTIAL_ID_PSW')]) {
+//               def username = env.NEXUS_CREDENTIAL_ID_USR
+//               sh'''
+//               apk add curl
+//               curl -u ${username} -o your_file.png "http://${NEXUS_URL}/repository/nexus-rep0/freeallianceInnovationLab/LoginWebApp/${BUILD_NUMBER}.0.0/LoginWebApp-${BUILD_NUMBER}.0.0.war"
+//               '''
+//             }
+//           }
+//         }
+//       }
+//     }  
+
+//   stage('Buid Docker Image') {
+//           steps {
+//           container('dind') {
+//             script {
+//               dockerImage = docker.build REPOSITORY_URI + ":${BUILD_NUMBER}.0.0"
+                  
+//         }
+//       }
+//    }
+//  }  
+
+// stage('Publish To AWS ECR') {
+//           steps {
+//           container('dind') {
+//              script{// This is the script that build and push the Docker image of the application.
+                 
+//                 docker.withRegistry( "https://${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}",  "ecr:${AWS_DEFAULT_REGION}:" + aws_credential ) {
+//                   dockerImage.push()
+     
+//                }           
+//              }        
+//            }
+//         }
+//      } 
+
+//   stage('AWS Cli SetUp for image signing') {
+//       steps {
+//         container('notationcli') {
+//           script {
+//               withCredentials([[
+//                         $class: 'AmazonWebServicesCredentialsBinding',
+//                         credentialsId: 's3-profile',
+//                         accessKeyVariable: 'AWS_ACCESS_KEY',
+//                         secretKeyVariable: 'AWS_SECRET_KEY'
+//                     ]]) {
+//                         sh '''
+//                             #!/bin/bash
+//                             aws --version
+//                             notation version
+//                             notation plugin ls
+
+//                             # Set the AWS access key and secret access key
+//                             aws configure set aws_access_key_id "${AWS_ACCESS_KEY}"
+//                             aws configure set aws_secret_access_key "${AWS_SECRET_KEY}"
+//                             echo "AWS credentials updated successfully."
+
+//                             echo "Creating signer profile"
+//                             Profile=$(aws signer get-signing-profile --profile-name "${AWS_SIGNER_PROFILE_NAME}" --output json --query "profileName")
+
+//                             if [ $Profile ]
+//                             then
+//                               echo "profile already exists"
+//                             else
+//                               aws signer put-signing-profile --profile-name "${AWS_SIGNER_PROFILE_NAME}" --platform-id Notation-OCI-SHA384-ECDSA
+//                               echo "profile created successfully"
+//                             fi
+
+
+//                             echo "Login to ecr with notation cli"
+//                              aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login \
+//                               --username AWS \
+//                               --password-stdin "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com"
+//                             echo "get image digest"
+//                             image_digest=$(aws ecr list-images --repository-name "${IMAGE_REPO_NAME}" --query imageIds[0].imageDigest --output text)
+
+//                             echo "sign image"
+//                             notation sign ${REPOSITORY_URI}@$image_digest --plugin com.amazonaws.signer.notation.plugin --id arn:aws:signer:us-east-1:665693299603:/signing-profiles/usda_poc
+//                             echo "verifying signature.............."
+//                             notation inspect ${REPOSITORY_URI}@$image_digest
+//                             echo "importing trustpolicy..............."
+//                             touch /root/.config/notation/trustpolicy.json
+//                             mv trustpolicy.json /root/.config/notation/trustpolicy.json
+//                             notation policy show
+//                         '''
+
+//                       }
+//                     }
+//                   }
+//                 }
+//               }
+
+//     stage('Add AWS Credentials') {
+//       steps {
+//         container('kubectl') {
+//           script {
+//               withCredentials([[
+//                         $class: 'AmazonWebServicesCredentialsBinding',
+//                         credentialsId: 's3-profile',
+//                         accessKeyVariable: 'AWS_ACCESS_KEY',
+//                         secretKeyVariable: 'AWS_SECRET_KEY'
+//                     ]]) {
+//                         sh '''
+//                             #!/bin/bash
+//                             if ! command -v aws &> /dev/null; then
+//                                 echo "AWS CLI is not installed. Please install it first."
+//                                 exit 1
+//                             fi
+
+//                             # Set the AWS access key and secret access key
+//                             aws configure set aws_access_key_id "${AWS_ACCESS_KEY}"
+//                             aws configure set aws_secret_access_key "${AWS_SECRET_KEY}"
+
+//                             echo "AWS credentials updated successfully."
+//                         '''
+
+//                       }
+//                     }
+//                   }
+//                 }
+//               }
+              
+
+//     stage('Deploy App') {
+//       steps {
+//         container('kubectl') {
+//           withKubeConfig([credentialsId: "${KUBERNETES_CREDENTIALS}" ,
+//                     serverUrl: "${CLUSTER_URL}" ,
+//                     ]) {
+//                  sh '''
+//                  kubectl create secret docker-registry regcred || true \
+//                   --docker-server=${AWS_ACCOUNT}.dkr.ecr.${AWS_REGION}.amazonaws.com \
+//                   --docker-username=AWS \
+//                   --docker-password=\$(aws ecr get-login-password) \
+//                   --namespace=team-dev || true && \
+//                  kubectl get pods --namespace=team-dev
+//                  kubectl apply -f TestApplication/mysql-pvc.yaml --namespace=team-dev
+//                  kubectl apply -f TestApplication/mysql-deployment.yaml --namespace=team-dev
+//                  kubectl apply -f TestApplication/tomcat-deployment.yaml --namespace=team-dev
+
+
+//                  ''' 
+                 
+//               }
+//             }
+//           }
+//         }
+//       }
+//     }
+
+
+
+// ##############################################################################################################
+
+// ##############################################################################################################
+import groovy.json.JsonSlurper
+
+def getFtpPublishProfile(def publishProfilesJson) {
+  def pubProfiles = new JsonSlurper().parseText(publishProfilesJson)
+  for (p in pubProfiles)
+    if (p['publishMethod'] == 'FTP')
+      return [url: p.publishUrl, username: p.userName, password: p.userPWD]
+}
+
+pipeline {
+  agent {
+    kubernetes {
+      yaml '''
+        apiVersion: v1
+        kind: Pod
+        metadata:
+          name: build-server
+        spec:
+          affinity:
+            nodeAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                nodeSelectorTerms:
+                - matchExpressions:
+                  - key: faamc
+                    operator: In
+                    values:
+                    - dev
+          containers:
+            - name: maven
+              image: maven:3-openjdk-17
+              command: 
+                - cat
+              tty: true
+            - name: kubectl
+              image: alpine/k8s:1.25.14
+              command:
+                - cat
+              tty: true
+            - name: azurecli
+              image: mcr.microsoft.com/azure-cli:latest
+              command:
+                - cat
+              tty: true
+            - name: dind
+              image: docker:dind
+              securityContext:
+                privileged: true
+              volumeMounts:
+                - name: dind-storage
+                  mountPath: /var/lib/docker
+          volumes:
+            - name: efs-volume
+              persistentVolumeClaim:
+                claimName: pvc-buildserver
+            - name: dind-storage
+              emptyDir: {}
+        '''    
+    }
+  }
+    environment { 
+        //artifact deployment bucket region          
+        region = "us-east-1"  
+        //artifact upload bucket region. (optional)                    
+        region1 = "us-east-2" 
+        AWS_SECRET_ID = 'your-secret-id' // Replace with the actual Secret ID
+        //aws credentials                    
+        aws_credential = "s3-profile" //aws credentials 
+        // Dockerhub credentials to push and pull images. 
+        //DOCKERHUB_CREDENTIALS = credentials('dockerhub')
+
+        //ARTIFACTORY = credentials('myartifactory')
+        AZURE_SUBSCRIPTION_ID='79e9d8d4-c283-47dc-8a70-569982230d31'
+        AZURE_TENANT_ID='4a06bbff-6d9b-4b0e-8db4-28862802648a'
+
+        CLUSTER_URL = 'https://faamc-eprtsyjn.hcp.westus.azmk8s.io:443'
+        KUBERNETES_CREDENTIALS  = 'eks'
+
+        SONAR_QUBE_INSTALLATION_NAME='sonar'
+        SONAR_QUBE_CREDENTIALS_ID = 'sonarqube'
+
+        NEXUS_VERSION = 'nexus3'
+        NEXUS_PROTOCOL = 'HTTP'
+        NEXUS_URL = '40.112.131.213:8081'
+        NEXUS_REPOSITORY = 'nexus-rep0'
+        NEXUS_CREDENTIAL_ID = 'nexus-secret'
+
+
+        AWS_ACCOUNT_ID='665693299603'
+        AWS_DEFAULT_REGION='us-east-1' 
+
+        IMAGE_REPO_NAME = 'usda_poc'
+        IMAGE_TAG='latest'
+        AWS_SIGNER_PROFILE_NAME = 'usda_poc'
+        REPOSITORY_URI = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}"
+        v="${BUILD_NUMBER}"
+    }
+
+
+
+  stages {    
+    stage('Code-Review') {
+      steps {
+        container('maven') {
+          withSonarQubeEnv(installationName: SONAR_QUBE_INSTALLATION_NAME , credentialsId: SONAR_QUBE_CREDENTIALS_ID) {
+                sh 'java -version'
+                sh 'mvn -B -DskipTests clean package -Dv=${BUILD_NUMBER} sonar:sonar'
+          }
+        }
+      }
+    }
+
+
+//    stage('Add Credentials') {
+//     steps {
+//         script {
+//             def credentialsId = 'nexus-temp-cred'
+//             def username = "${env.ARTIFACTORY_USR}"
+//             def password = "${env.ARTIFACTORY_PSW}"
+
+//             def domain = com.cloudbees.plugins.credentials.domains.Domain.global()
+//             def store = Jenkins.instance.getExtensionList("com.cloudbees.plugins.credentials.SystemCredentialsProvider")[0].getStore()
+
+//             def usernameAndPassword = new com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl(
+//                 com.cloudbees.plugins.credentials.CredentialsScope.GLOBAL,
+//                 credentialsId,
+//                 "Secret Description",
+//                 username,
+//                 password
+//             )
+
+//             store.addCredentials(domain, usernameAndPassword)
+//         }
+//     }
+// }    
+    
+  stage("Publish to Nexus Repository Manager") {
+            steps {
+            container('maven') {
+                    script {
+                    sh'''
+                    echo "Username: $ARTIFACTORY_USR"
+                    echo "Password: $ARTIFACTORY_PSW"
+                    '''
+                    def pom = readMavenPom(file: 'pom.xml');
+                    filesByGlob = findFiles(glob: "target/*.${pom.packaging}");
+                    echo "${filesByGlob[0].name} ${filesByGlob[0].path} ${filesByGlob[0].directory} ${filesByGlob[0].length} ${filesByGlob[0].lastModified}"
+                    artifactPath = filesByGlob[0].path;
+                    artifactExists = fileExists artifactPath;
+                    if(artifactExists) {
+                        echo "*** File: ${artifactPath}, group: ${pom.groupId}, packaging: ${pom.packaging}, version ${pom.version}";
+                        nexusArtifactUploader(
+                            nexusVersion: NEXUS_VERSION,
+                            protocol: NEXUS_PROTOCOL,
+                            nexusUrl: NEXUS_URL,
+                            groupId: pom.groupId,
+                            version: "${BUILD_NUMBER}.0.0",
+                            repository: NEXUS_REPOSITORY,
+                            credentialsId: NEXUS_CREDENTIAL_ID,
+                            artifacts: [
+                                [artifactId: pom.artifactId,
+                                classifier: '',
+                                file: artifactPath,
+                                type: pom.packaging],
+                                [artifactId: pom.artifactId,
+                                classifier: '',
+                                file: "pom.xml",
+                                type: "pom"]
+                            ]
+                        );
+                    } else {
+                        error "*** File: ${artifactPath}, could not be found";
+                    }
+                }
+            }
+        }
+     }
+
+//    stage('Delete Credentials') {
+//     steps {
+//         script {
+//             def credentialsId = 'nexus-temp-cred'
+            
+//             // Delete the specified credentials by their ID
+//             credentials([[$class: 'DeleteCredentialsBinding', credentialsId: credentialsId]])
+            
+//             println "Deleted credentials with ID: ${credentialsId}"
+//         }
+//     }
+// }
+
+ stage('Retrive Artifact from Nexus') {
+          steps {
+          container('dind') {
+            script {
+            withCredentials([usernamePassword(credentialsId: NEXUS_CREDENTIAL_ID, usernameVariable: 'NEXUS_CREDENTIAL_ID_USR', passwordVariable: 'NEXUS_CREDENTIAL_ID_PSW')]) {
+              def username = env.NEXUS_CREDENTIAL_ID_USR
+              sh'''
+              apk add curl
+              curl -u ${username} -o your_file.png "http://${NEXUS_URL}/repository/nexus-rep0/freeallianceInnovationLab/LoginWebApp/${BUILD_NUMBER}.0.0/LoginWebApp-${BUILD_NUMBER}.0.0.war"
+              '''
+            }
+          }
+        }
+      }
+    }  
+
+stage('deploy') {
+    steps {
+    container ('azurecli') {
+        script {
+      def resourceGroup = 'faamcpipeline-dev-westus-001'
+      def webAppName = 'faamtestdeployment'
+      // login Azure
+      withCredentials([usernamePassword(credentialsId: 'azureserviceprincipal', passwordVariable: 'AZURE_CLIENT_SECRET', usernameVariable: 'AZURE_CLIENT_ID')]) {
+       sh '''
+          az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET -t $AZURE_TENANT_ID
+          az account set -s $AZURE_SUBSCRIPTION_ID
+        '''
+      }
+      // get publish settings
+      def pubProfilesJson = sh script: "az webapp deployment list-publishing-profiles -g $resourceGroup -n $webAppName", returnStdout: true
+      def ftpProfile = getFtpPublishProfile pubProfilesJson
+      // upload package
+      sh "apk add curl"
+      sh "curl -T target/LoginWebApp-${BUILD_NUMBER}.0.0.war $ftpProfile.url/webapps/LoginWebApp-${BUILD_NUMBER}.0.0.war -u '$ftpProfile.username:$ftpProfile.password'"
+      // log out
+      sh 'az logout'
+        }
+      }
+   }    
+}
+//   stage('Buid Docker Image') {
+//           steps {
+//           container('dind') {
+//             script {
+//               dockerImage = docker.build REPOSITORY_URI + ":${BUILD_NUMBER}.0.0"
+                  
+//         }
+//       }
+//    }
+//  }  
+
+// stage('Publish To AWS ECR') {
+//           steps {
+//           container('dind') {
+//              script{// This is the script that build and push the Docker image of the application.
+                 
+//                 docker.withRegistry( "https://${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}",  "ecr:${AWS_DEFAULT_REGION}:" + aws_credential ) {
+//                   dockerImage.push()
+     
+//                }           
+//              }        
+//            }
+//         }
+//      } 
+
+//   stage('AWS Cli SetUp for image signing') {
+//       steps {
+//         container('notationcli') {
+//           script {
+//               withCredentials([[
+//                         $class: 'AmazonWebServicesCredentialsBinding',
+//                         credentialsId: 's3-profile',
+//                         accessKeyVariable: 'AWS_ACCESS_KEY',
+//                         secretKeyVariable: 'AWS_SECRET_KEY'
+//                     ]]) {
+//                         sh '''
+//                             #!/bin/bash
+//                             aws --version
+//                             notation version
+//                             notation plugin ls
+
+//                             # Set the AWS access key and secret access key
+//                             aws configure set aws_access_key_id "${AWS_ACCESS_KEY}"
+//                             aws configure set aws_secret_access_key "${AWS_SECRET_KEY}"
+//                             echo "AWS credentials updated successfully."
+
+//                             echo "Creating signer profile"
+//                             Profile=$(aws signer get-signing-profile --profile-name "${AWS_SIGNER_PROFILE_NAME}" --output json --query "profileName")
+
+//                             if [ $Profile ]
+//                             then
+//                               echo "profile already exists"
+//                             else
+//                               aws signer put-signing-profile --profile-name "${AWS_SIGNER_PROFILE_NAME}" --platform-id Notation-OCI-SHA384-ECDSA
+//                               echo "profile created successfully"
+//                             fi
+
+
+//                             echo "Login to ecr with notation cli"
+//                              aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login \
+//                               --username AWS \
+//                               --password-stdin "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com"
+//                             echo "get image digest"
+//                             image_digest=$(aws ecr list-images --repository-name "${IMAGE_REPO_NAME}" --query imageIds[0].imageDigest --output text)
+
+//                             echo "sign image"
+//                             notation sign ${REPOSITORY_URI}@$image_digest --plugin com.amazonaws.signer.notation.plugin --id arn:aws:signer:us-east-1:665693299603:/signing-profiles/usda_poc
+//                             echo "verifying signature.............."
+//                             notation inspect ${REPOSITORY_URI}@$image_digest
+//                             echo "importing trustpolicy..............."
+//                             touch /root/.config/notation/trustpolicy.json
+//                             mv trustpolicy.json /root/.config/notation/trustpolicy.json
+//                             notation policy show
+//                         '''
+
+//                       }
+//                     }
+//                   }
+//                 }
+//               }
+
+    // stage('Add AWS Credentials') {
+    //   steps {
+    //     container('kubectl') {
+    //       script {
+    //           withCredentials([[
+    //                     $class: 'AmazonWebServicesCredentialsBinding',
+    //                     credentialsId: 's3-profile',
+    //                     accessKeyVariable: 'AWS_ACCESS_KEY',
+    //                     secretKeyVariable: 'AWS_SECRET_KEY'
+    //                 ]]) {
+    //                     sh '''
+    //                         #!/bin/bash
+    //                         if ! command -v aws &> /dev/null; then
+    //                             echo "AWS CLI is not installed. Please install it first."
+    //                             exit 1
+    //                         fi
+
+    //                         # Set the AWS access key and secret access key
+    //                         aws configure set aws_access_key_id "${AWS_ACCESS_KEY}"
+    //                         aws configure set aws_secret_access_key "${AWS_SECRET_KEY}"
+
+    //                         echo "AWS credentials updated successfully."
+    //                     '''
+
+    //                   }
+    //                 }
+    //               }
+    //             }
+    //           }
+              
+
+    // stage('Deploy App') {
+    //   steps {
+    //     container('kubectl') {
+    //       withKubeConfig([credentialsId: "${KUBERNETES_CREDENTIALS}" ,
+    //                 serverUrl: "${CLUSTER_URL}" ,
+    //                 ]) {
+    //              sh '''
+    //              kubectl create secret docker-registry regcred || true \
+    //               --docker-server=${AWS_ACCOUNT}.dkr.ecr.${AWS_REGION}.amazonaws.com \
+    //               --docker-username=AWS \
+    //               --docker-password=\$(aws ecr get-login-password) \
+    //               --namespace=team-dev || true && \
+    //              kubectl get pods --namespace=team-dev
+    //              kubectl apply -f TestApplication/mysql-pvc.yaml --namespace=team-dev
+    //              kubectl apply -f TestApplication/mysql-deployment.yaml --namespace=team-dev
+    //              kubectl apply -f TestApplication/tomcat-deployment.yaml --namespace=team-dev
+
+
+    //              ''' 
+                 
+    //           }
+    //         }
+    //       }
+    //     }
+      }
+    }
+hawk.dZ63tE9OA8STHNHiJnHN.1kPz2jFXXX9FwgFByhcY
