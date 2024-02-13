@@ -47,6 +47,26 @@ pipeline {
         reportTitles: 'The Report'])
       }
       }
+     stage ("Get tenable Scan Result") {
+      steps {
+        sh '''
+         rm reports/tenable-report.html
+         mkdir reports
+         pip install requests
+         pip install jinja2
+         python3 tenable-scan.py
+      
+
+        '''
+        publishHTML (target : [allowMissing: false,
+        alwaysLinkToLastBuild: true,
+        keepAll: True,
+        reportDir: 'reports',
+        reportFiles: 'tenable-report.html',
+        reportName: 'tenable',
+        reportTitles: 'tenable'])
+      }
+      }
     
   }
 }
