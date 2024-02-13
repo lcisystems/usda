@@ -31,7 +31,7 @@ pipeline {
       steps {
         sh '''
          #rm reports/scan_result.html
-         mkdir reports
+         #mkdir reports
          pip install requests
          pip install jinja2
          python3 scan.py
