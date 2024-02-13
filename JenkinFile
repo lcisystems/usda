@@ -59,7 +59,7 @@ pipeline {
         '''
         publishHTML (target : [allowMissing: false,
         alwaysLinkToLastBuild: true,
-        keepAll: True,
+        keepAll: 'True',
         reportDir: 'reports',
         reportFiles: 'tenable-report.html',
         reportName: 'tenable',
