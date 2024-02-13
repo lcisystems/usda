@@ -43,8 +43,8 @@ pipeline {
         keepAll: false,
         reportDir: 'reports',
         reportFiles: 'scan_result.html',
-        reportName: 'My Reports',
-        reportTitles: 'The Report'])
+        reportName: 'StackHawk',
+        reportTitles: 'StackHawk Scan'])
       }
       }
      stage ("Get tenable Scan Result") {
@@ -66,6 +66,7 @@ pipeline {
         reportTitles: 'tenable'])
       }
       }
+      
     
   }
 }
