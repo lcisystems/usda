@@ -50,10 +50,9 @@ pipeline {
      stage ("Get tenable Scan Result") {
       steps {
         sh '''
-         rm reports/tenable-report.html
-         mkdir reports
-         pip install requests
-         pip install jinja2
+         #rm reports/tenable-report.html
+         #pip install requests
+         #pip install jinja2
          python3 tenable-scan.py
       
 
