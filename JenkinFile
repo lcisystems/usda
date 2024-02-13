@@ -30,7 +30,7 @@ pipeline {
       }
       steps {
         sh '''
-         rm reports/scan_result.html
+         #rm reports/scan_result.html
          mkdir reports
          pip install requests
          pip install jinja2
